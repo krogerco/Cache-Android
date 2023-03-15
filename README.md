@@ -1,2 +1,17 @@
-# Cache-Android
-Key/Value memory cache with persistence.
+# Cache for Android
+
+Words
+
+## Requirements
+
+## Installation
+
+## Quick Start
+
+## Documentation
+
+### Online Documentation
+
+## Communication
+
+If you have issues or suggestions, please open an issue on GitHub.
