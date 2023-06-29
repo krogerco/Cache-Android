@@ -1,0 +1,52 @@
+# editor tempfiles
+*~
+# MacOS temp files
+.DS_Store
+
+# Built application files
+*.apk
+*.ap_
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio generated files and folders
+.cxx
+.externalNativeBuild/
+.navigation/
+captures/
+
+# Android Studio captures folder
+
+# Intellij
+*.iml
+.idea/
+misc.xml
+.classpath
+.project
+.settings
+
+# Other
+node_modules

@@ -1,0 +1,4 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+ktlint "**/src/**/*.kt" "!**/generated/**" --android --reporter=plain?group_by_file
