@@ -66,8 +66,8 @@ public data class CachePolicy internal constructor(
          * @param maxSize the maximize number of entries the cache can hold.
          */
         public fun maxSize(maxSize: Int): CachePolicyBuilder = apply {
-            require(maxSize >= 0) {
-                "maxSize must be >= 0. maxSize = $maxSize"
+            require(maxSize > 0) {
+                "maxSize must be > 0. maxSize = $maxSize"
             }
             this.maxSize = maxSize
         }
@@ -76,8 +76,8 @@ public data class CachePolicy internal constructor(
          * @param entryTtl (time to live) how long an entry remains in the cache after insertion before being purged.
          */
         public fun entryTtl(entryTtl: Duration): CachePolicyBuilder = apply {
-            require(entryTtl.isNegative().not()) {
-                "entryTtl must be >= 0. entryTtl = ${entryTtl.toIsoString()}"
+            require(entryTtl.isPositive()) {
+                "entryTtl must be > 0. entryTtl = ${entryTtl.toIsoString()}"
             }
             check(entryTti == DEFAULT_DURATION_POLICY) {
                 "entryTtl cannot be set after entryTti has been set. entryTti = ${entryTti.toIsoString()}"
@@ -89,8 +89,8 @@ public data class CachePolicy internal constructor(
          * @param entryTti (time to idle) how long after an entry is last accessed before being purged.
          */
         public fun entryTti(entryTti: Duration): CachePolicyBuilder = apply {
-            require(entryTti.isNegative().not()) {
-                "entryTti must be >= 0. entryTti = ${entryTti.toIsoString()}"
+            require(entryTti.isPositive()) {
+                "entryTti must be > 0. entryTti = ${entryTti.toIsoString()}"
             }
             check(entryTtl == DEFAULT_DURATION_POLICY) {
                 "entryTti cannot be set after entryTtl has been set. entryTtl = ${entryTtl.toIsoString()}"

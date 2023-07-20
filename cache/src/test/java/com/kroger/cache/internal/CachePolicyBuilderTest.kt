@@ -31,14 +31,14 @@ import kotlin.time.Duration.Companion.seconds
 
 internal class CachePolicyBuilderTest {
     @Test
-    fun `given cache policy builder when ttl negative then exception thrown`() {
-        val ttl = (-1).seconds
+    fun `given cache policy builder when ttl not positive then exception thrown`() {
+        val ttl = 0.seconds
         val exception = assertThrows<IllegalArgumentException> {
             CachePolicy.builder()
                 .entryTtl(ttl)
                 .build()
         }
-        assertThat(exception.message).isEqualTo("entryTtl must be >= 0. entryTtl = ${ttl.toIsoString()}")
+        assertThat(exception.message).isEqualTo("entryTtl must be > 0. entryTtl = ${ttl.toIsoString()}")
     }
 
     @Test
@@ -54,14 +54,14 @@ internal class CachePolicyBuilderTest {
     }
 
     @Test
-    fun `given cache policy builder when tti negative then exception thrown`() {
-        val tti = (-1).seconds
+    fun `given cache policy builder when tti not positive then exception thrown`() {
+        val tti = 0.seconds
         val exception = assertThrows<IllegalArgumentException> {
             CachePolicy.builder()
                 .entryTti(tti)
                 .build()
         }
-        assertThat(exception.message).isEqualTo("entryTti must be >= 0. entryTti = ${tti.toIsoString()}")
+        assertThat(exception.message).isEqualTo("entryTti must be > 0. entryTti = ${tti.toIsoString()}")
     }
 
     @Test
@@ -77,14 +77,14 @@ internal class CachePolicyBuilderTest {
     }
 
     @Test
-    fun `given cache policy builder when setting maxSize less than 0 then exception thrown`() {
+    fun `given cache policy builder when setting maxSize not positive then exception thrown`() {
         val maxSize = -1
         val exception = assertThrows<IllegalArgumentException> {
             CachePolicy.builder()
                 .maxSize(maxSize)
                 .build()
         }
-        assertThat(exception.message).isEqualTo("maxSize must be >= 0. maxSize = $maxSize")
+        assertThat(exception.message).isEqualTo("maxSize must be > 0. maxSize = $maxSize")
     }
 
     @Test
