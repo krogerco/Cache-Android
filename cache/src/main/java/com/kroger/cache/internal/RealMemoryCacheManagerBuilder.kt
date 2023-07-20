@@ -32,6 +32,7 @@ import com.kroger.telemetry.Telemeter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -75,7 +76,7 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
             this.dispatcher = dispatcher
         }
 
-    override suspend fun build(): Cache<K, V> {
+    override suspend fun build(): Cache<K, V> = withContext(dispatcher) {
         val sortByProperty = cachePolicy.sortByProperty<K, V>()
 
         // the new cache policy may require a new sort order
@@ -94,7 +95,7 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
             dispatcher = dispatcher,
         )
 
-        return memoryLevelNotifier?.let {
+        return@withContext memoryLevelNotifier?.let {
             MemoryLevelCacheManagerDecorator(memoryCacheManager, it, telemeter)
         } ?: memoryCacheManager
     }
