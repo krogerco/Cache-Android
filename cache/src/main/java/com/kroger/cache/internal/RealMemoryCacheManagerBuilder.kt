@@ -71,7 +71,7 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
             this.telemeter = telemeter
         }
 
-    internal fun dispatcher(dispatcher: CoroutineDispatcher): MemoryCacheManagerBuilder<K, V> =
+    override fun dispatcher(dispatcher: CoroutineDispatcher): MemoryCacheManagerBuilder<K, V> =
         apply {
             this.dispatcher = dispatcher
         }

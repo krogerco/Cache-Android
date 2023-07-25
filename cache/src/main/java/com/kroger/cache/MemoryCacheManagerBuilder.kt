@@ -26,6 +26,7 @@ package com.kroger.cache
 import com.kroger.cache.internal.CacheEntry
 import com.kroger.cache.internal.RealMemoryCacheManagerBuilder
 import com.kroger.telemetry.Telemeter
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlin.time.Duration
 
@@ -61,6 +62,12 @@ public interface MemoryCacheManagerBuilder<K, V> {
      * Defaults to null (no logging).
      */
     public fun telemeter(telemeter: Telemeter): MemoryCacheManagerBuilder<K, V>
+
+    /**
+     * The [CoroutineDispatcher] to use when reading and writing to the [SnapshotPersistentCache].
+     * Defaults to [Dispatchers.IO][kotlinx.coroutines.Dispatchers.IO].
+     */
+    public fun dispatcher(dispatcher: CoroutineDispatcher): MemoryCacheManagerBuilder<K, V>
 
     public companion object {
         /**
