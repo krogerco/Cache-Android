@@ -73,7 +73,7 @@ internal class SnapshotFileCacheTest {
 
     @Test
     fun `given snapshot file cache when data save fails then no data saved and an error is logged`() = runTest {
-        val fileCache = createSnapshotFileCache(tempDir.resolve("i/dont/exist"))
+        val fileCache = createSnapshotFileCache(File("/i/dont/exist"))
         fileCache.save("Failed :(")
         assertThat(fakeTelemeter.events).hasSize(1)
         assertThat(fakeTelemeter.events.first().description).contains("An error occurred while writing to the cache file")
@@ -81,7 +81,7 @@ internal class SnapshotFileCacheTest {
 
     @Test
     fun `given snapshot file cache when read fails then null is returned and an error is logged`() = runTest {
-        val fileCache = createSnapshotFileCache(tempDir.resolve("i/dont/exist"))
+        val fileCache = createSnapshotFileCache(File("/i/dont/exist"))
         val readData = fileCache.read()
 
         assertThat(readData).isNull()

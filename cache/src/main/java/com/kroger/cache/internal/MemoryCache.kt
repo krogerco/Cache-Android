@@ -44,23 +44,23 @@ internal class MemoryCache<K, V>(
     constructor(initialCapacity: Int = DEFAULT_INITIAL_CAPACITY) :
         this(initialCapacity, false)
 
-    override fun get(key: K): V? {
+    override suspend fun get(key: K): V? {
         return cacheMap[key]
     }
 
-    override fun put(key: K, value: V) {
+    override suspend fun put(key: K, value: V) {
         cacheMap[key] = value
     }
 
-    override fun putAll(pairs: Iterable<Pair<K, V>>) {
+    override suspend fun putAll(pairs: Iterable<Pair<K, V>>) {
         cacheMap.putAll(pairs)
     }
 
-    override fun remove(key: K) {
+    override suspend fun remove(key: K) {
         cacheMap.remove(key)
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         cacheMap.clear()
     }
 

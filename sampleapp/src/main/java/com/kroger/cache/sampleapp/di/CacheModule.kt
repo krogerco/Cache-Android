@@ -35,7 +35,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.serializer
 
 @Module
@@ -44,29 +43,27 @@ class CacheModule {
     @Provides
     fun provideCacheConfigFileCache(
         @ApplicationContext context: Context,
-    ): SnapshotPersistentCache<CacheConfig> = runBlocking {
+    ): SnapshotPersistentCache<CacheConfig> =
         SnapshotFileCacheBuilder.from(
             context,
             filename = "cacheConfig.json",
             valueSerializer = CacheConfig.serializer(),
-        ).build().getOrThrow()
-    }
+        ).build()
 
     @Provides
     fun provideFileCache(
         @ApplicationContext context: Context,
-    ): SnapshotPersistentCache<List<CacheEntry<String, String>>> = runBlocking {
+    ): SnapshotPersistentCache<List<CacheEntry<String, String>>> =
         SnapshotFileCacheBuilder.from(
             context,
             filename = "cacheFile.json",
             keySerializer = String.serializer(),
             valueSerializer = String.serializer(),
-        ).build().getOrThrow()
-    }
+        ).build()
 
     @Provides
     fun provideSnapshotCacheFlowWrapper(
         snapshotCache: SnapshotPersistentCache<List<CacheEntry<String, String>>>,
     ): FlowPersistentCache<List<CacheEntry<String, String>>> =
-        runBlocking { FlowPersistentCache.from(snapshotCache) }
+        FlowPersistentCache(snapshotCache)
 }

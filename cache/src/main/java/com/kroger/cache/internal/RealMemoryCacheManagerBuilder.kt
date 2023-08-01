@@ -32,21 +32,21 @@ import com.kroger.telemetry.Telemeter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.SupervisorJob
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 internal class RealMemoryCacheManagerBuilder<K, V>(
-    private val coroutineScope: CoroutineScope,
-    private val snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>?,
     private val timeProvider: TimeProvider,
 ) : MemoryCacheManagerBuilder<K, V> {
     private var saveFrequency: Duration = DEFAULT_SAVE_FREQUENCY
     private var cachePolicy: CachePolicy = DEFAULT_CACHE_POLICY
     private var dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private var coroutineScope: CoroutineScope? = null
     private var memoryLevelNotifier: MemoryLevelNotifier? = null
     private var telemeter: Telemeter? = null
+    private var snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null
 
     override fun cachePolicy(cachePolicy: CachePolicy): MemoryCacheManagerBuilder<K, V> =
         apply {
@@ -76,26 +76,27 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
             this.dispatcher = dispatcher
         }
 
-    override suspend fun build(): Cache<K, V> = withContext(dispatcher) {
-        val sortByProperty = cachePolicy.sortByProperty<K, V>()
+    override fun coroutineScope(coroutineScope: CoroutineScope): MemoryCacheManagerBuilder<K, V> =
+        apply {
+            this.coroutineScope = coroutineScope
+        }
 
-        // the new cache policy may require a new sort order
-        val allEntries = snapshotPersistentCache?.read().orEmpty().sortedBy(sortByProperty)
-        val initialCapacity = maxOf(allEntries.size, MemoryCache.DEFAULT_INITIAL_CAPACITY)
-        val memoryCache = MemoryCache<K, CacheEntry<K, V>>(initialCapacity, accessOrder = cachePolicy.hasTtiPolicy)
-        allEntries.forEach { memoryCache.put(it.key, it) }
+    override fun snapshotPersistentCache(snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>): MemoryCacheManagerBuilder<K, V> =
+        apply {
+            this.snapshotPersistentCache = snapshotPersistentCache
+        }
 
+    override fun build(): Cache<K, V> {
         val memoryCacheManager = MemoryCacheManager(
-            memoryCache,
             snapshotPersistentCache,
             cachePolicy = cachePolicy,
-            coroutineScope = coroutineScope,
+            coroutineScope = coroutineScope ?: CoroutineScope(SupervisorJob() + dispatcher),
             saveFrequency = saveFrequency,
             timeProvider = timeProvider,
             dispatcher = dispatcher,
         )
 
-        return@withContext memoryLevelNotifier?.let {
+        return memoryLevelNotifier?.let {
             MemoryLevelCacheManagerDecorator(memoryCacheManager, it, telemeter)
         } ?: memoryCacheManager
     }
@@ -111,10 +112,3 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
             .build()
     }
 }
-
-private fun <K, V> CachePolicy.sortByProperty(): (CacheEntry<K, V>) -> Long =
-    if (hasTtiPolicy) {
-        CacheEntry<K, V>::lastAccessDate::get
-    } else {
-        CacheEntry<K, V>::creationDate::get
-    }

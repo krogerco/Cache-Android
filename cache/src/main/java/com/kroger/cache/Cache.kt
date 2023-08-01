@@ -30,13 +30,13 @@ public interface Cache<K, V> {
     /**
      * @return the value corresponding with the given [key], or null if the key is not present or the value is expired.
      */
-    public fun get(key: K): V?
+    public suspend fun get(key: K): V?
 
     /**
      * Associates the given [key] with the given [value].
      * If [key] is already in the [Cache] the value will be overwritten by [value].
      */
-    public fun put(key: K, value: V)
+    public suspend fun put(key: K, value: V)
 
     /**
      * Each pair will be inserted into the cache associating the [Pair.first] element with [Pair.second].
@@ -44,28 +44,15 @@ public interface Cache<K, V> {
      *
      * @param pairs the key value pairs to insert into the cache.
      */
-    public fun putAll(pairs: Iterable<Pair<K, V>>)
+    public suspend fun putAll(pairs: Iterable<Pair<K, V>>)
 
     /**
      * Removes the entry for [key] from the [Cache].
      */
-    public fun remove(key: K)
+    public suspend fun remove(key: K)
 
     /**
      * Removes all entries from the [Cache].
      */
-    public fun clear()
+    public suspend fun clear()
 }
-
-/**
- * @see [Cache.put]
- */
-public operator fun <K, V> Cache<K, V>.set(key: K, value: V) {
-    put(key, value)
-}
-
-/**
- * @see [Cache.get]
- */
-public operator fun <K, V> Cache<K, V>.get(key: K): V? =
-    get(key)

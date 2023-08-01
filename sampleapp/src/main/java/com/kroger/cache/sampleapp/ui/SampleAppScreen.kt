@@ -120,7 +120,7 @@ private fun SampleAppScreenContent(
     onUpdateTemporalPolicy: (TemporalPolicy) -> Unit = {},
     onApplyCacheOptions: () -> Unit = {},
     onDeleteEntry: (String) -> Unit = {},
-    onGetEntry: (String) -> String? = { null },
+    onGetEntry: (String) -> Unit = { },
     onUpdateEntryWithRandomValue: (String) -> Unit = {},
     onAddRandomEntries: (Int) -> Unit = {},
 ) {
@@ -238,7 +238,7 @@ private fun CacheOptions(
 private fun CacheEntries(
     uiState: SampleAppUiState,
     onDeleteEntry: (String) -> Unit = { },
-    onGetEntry: (String) -> String? = { null },
+    onGetEntry: (String) -> Unit = { },
     onUpdateEntryWithRandomValue: (String) -> Unit = { },
 ) {
     HeaderCard(header = stringResource(R.string.cache_entries)) {
@@ -263,7 +263,7 @@ private fun CacheEntries(
 private fun LazyItemScope.CacheEntry(
     entry: CacheEntry<String, String>,
     cachePolicy: CachePolicy,
-    onGetEntry: (String) -> String?,
+    onGetEntry: (String) -> Unit,
     onUpdateEntryWithRandomValue: (String) -> Unit,
     onDeleteEntry: (String) -> Unit,
 ) {

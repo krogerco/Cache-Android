@@ -431,14 +431,17 @@ internal class MemoryCacheManagerTest {
         saveFrequency: Duration = defaultSaveFrequency,
         memoryLevelNotifier: MemoryLevelNotifier? = null,
     ): Cache<K, V> {
-        return RealMemoryCacheManagerBuilder(
-            scope,
-            snapshotPersistentCache,
+        return RealMemoryCacheManagerBuilder<K, V>(
             fakeTimeProvider,
         ).dispatcher(dispatcher)
+            .coroutineScope(scope)
             .cachePolicy(cachePolicy)
             .saveFrequency(saveFrequency)
-            .memoryLevelNotifier(memoryLevelNotifier)
+            .memoryLevelNotifier(memoryLevelNotifier).also {
+                if (snapshotPersistentCache != null) {
+                    it.snapshotPersistentCache(snapshotPersistentCache)
+                }
+            }
             .build()
     }
 

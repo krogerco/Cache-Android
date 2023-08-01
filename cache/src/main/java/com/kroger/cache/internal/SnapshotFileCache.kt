@@ -40,8 +40,22 @@ internal class SnapshotFileCache<T>(
     private val telemeter: Telemeter? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : SnapshotPersistentCache<T> {
+
+    private fun ensureCacheFileCreated() {
+        file.parentFile?.let { parentDirectory ->
+            check(parentDirectory.exists() || parentDirectory.mkdirs()) {
+                "Unable to create cache directory at: absolutePath=${parentDirectory.absolutePath}"
+            }
+        }
+
+        check(file.exists() || file.createNewFile()) {
+            "Unable to create cache file at: absolutePath=${file.absolutePath}"
+        }
+    }
+
     override suspend fun read(): T? = withContext(dispatcher) {
         runCatching {
+            ensureCacheFileCreated()
             readDataFromFile(file.readBytes())
         }.onFailure {
             telemeter?.e(TAG, "An error occurred while reading from the cache file: ${file.absolutePath}", it)
@@ -50,6 +64,7 @@ internal class SnapshotFileCache<T>(
 
     override suspend fun save(cachedData: T?): Unit = withContext(dispatcher) {
         runCatching {
+            ensureCacheFileCreated()
             val cachedDataBytes = writeDataToFile(cachedData)
             file.writeBytes(cachedDataBytes)
         }.onFailure {

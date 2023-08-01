@@ -24,15 +24,14 @@
 package com.kroger.cache.internal
 
 import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.get
-import com.kroger.cache.set
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 internal class MemoryCacheTest {
     private val cache = MemoryCache<String, String>()
 
     @Test
-    fun `when entry added then entry exists in cache`() {
+    fun `when entry added then entry exists in cache`() = runBlocking {
         assertThat(cache.size()).isEqualTo(0)
         val (key, value) = Pair("key", "value")
         cache.put(key, value)
@@ -41,15 +40,7 @@ internal class MemoryCacheTest {
     }
 
     @Test
-    fun `when entry added with operator then entry in cache`() {
-        val (key, value) = Pair("key", "value")
-        cache[key] = value
-
-        assertThat(cache[key]).isEqualTo(value)
-    }
-
-    @Test
-    fun `when multiple entries added then entries exist in cache`() {
+    fun `when multiple entries added then entries exist in cache`() = runBlocking {
         val pair1 = Pair("key1", "value1")
         val pair2 = Pair("key2", "value2")
         cache.putAll(listOf(pair1, pair2))
@@ -58,25 +49,25 @@ internal class MemoryCacheTest {
     }
 
     @Test
-    fun `when entry updated then new value is in cache`() {
+    fun `when entry updated then new value is in cache`() = runBlocking {
         val (key, value) = Pair("key", "value")
         cache.put(key, value)
-        assertThat(cache[key]).isEqualTo(value)
+        assertThat(cache.get(key)).isEqualTo(value)
         cache.put(key, "updated")
-        assertThat(cache[key]).isEqualTo("updated")
+        assertThat(cache.get(key)).isEqualTo("updated")
     }
 
     @Test
-    fun `when entry removed then entry is no longer in cache`() {
+    fun `when entry removed then entry is no longer in cache`() = runBlocking {
         val (key, value) = Pair("key", "value")
         cache.put(key, value)
-        assertThat(cache[key]).isEqualTo(value)
+        assertThat(cache.get(key)).isEqualTo(value)
         cache.remove(key)
-        assertThat(cache[key]).isNull()
+        assertThat(cache.get(key)).isNull()
     }
 
     @Test
-    fun `when clear called then cache becomes empty`() {
+    fun `when clear called then cache becomes empty`() = runBlocking {
         val (key, value) = Pair("key", "value")
         cache.put(key, value)
         assertThat(cache.get(key)).isNotNull()
@@ -86,7 +77,7 @@ internal class MemoryCacheTest {
     }
 
     @Test
-    fun `when getAll called then all entries in cache returned`() {
+    fun `when getAll called then all entries in cache returned`() = runBlocking {
         assertThat(cache.getAll()).isEmpty()
         val firstEntry = Pair("key1", "value1")
         val secondEntry = Pair("key2", "value2")

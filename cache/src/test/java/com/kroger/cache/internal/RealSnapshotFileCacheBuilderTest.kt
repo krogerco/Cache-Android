@@ -25,54 +25,17 @@ package com.kroger.cache.internal
 
 import com.google.common.truth.Truth.assertThat
 import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeSnapshotFileCacheDataHandler
-import com.kroger.cache.fake.FakeTelemeter
-import com.kroger.telemetry.facet.Failure
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.builtins.serializer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class RealSnapshotFileCacheBuilderTest {
     @field:TempDir
     private lateinit var tempDir: File
-    private val telemeter = FakeTelemeter()
-
-    @Test
-    fun `given file cache builder when build called and cannot create parentDirectory then result failure with error logged`() = runTest {
-        val result = createSnapshotFileCacheBuilder(File("/pathdoesnotexist")).build()
-        assertThat(result.isFailure).isTrue()
-        val exception = result.exceptionOrNull()
-        assertThat(exception).isInstanceOf(IllegalStateException::class.java)
-        assertThat(exception?.message).isEqualTo("Unable to create cache directory=/pathdoesnotexist")
-        assertThat(telemeter.events).hasSize(1)
-    }
-
-    @Test
-    fun `given file cache builder when build called and cannot create cache file then result failure with error logged`() = runTest {
-        val result = createSnapshotFileCacheBuilder(filename = "i/dont/exist").build()
-        assertThat(result.isFailure).isTrue()
-        assertThat(result.exceptionOrNull()).isInstanceOf(IOException::class.java)
-        assertThat(telemeter.events).hasSize(1)
-        val failureFacet = telemeter.events.first().facets
-            .filterIsInstance(Failure::class.java).first()
-        // make sure error message contains the directory name and filename
-        assertThat(failureFacet.message).contains("directory=")
-        assertThat(failureFacet.message).contains("filename=")
-    }
-
-    @Test
-    fun `given file cache builder when build called successfully then success returned`() = runTest {
-        val result = createSnapshotFileCacheBuilder().build()
-        assertThat(result.getOrNull()).isInstanceOf(SnapshotFileCache::class.java)
-        assertThat(telemeter.events).isEmpty()
-    }
 
     @Test
     fun `given snapshot file cache from builder when values written to cache then expected values read from cache`() = runTest {
@@ -81,7 +44,7 @@ internal class RealSnapshotFileCacheBuilderTest {
             "testFile",
             String.serializer(),
             Int.serializer(),
-        ).build().getOrThrow()
+        ).build()
         val entry1 = CacheEntry("1", 1, 0L, 0L)
         val entry2 = CacheEntry("2", 2, 0L, 0L)
         val entries = listOf(entry1, entry2)
@@ -112,7 +75,7 @@ internal class RealSnapshotFileCacheBuilderTest {
             filename,
             readFunc,
             writeFunc,
-        ).build().getOrThrow()
+        ).build()
 
         fileCache.save("")
         assertThat(writeCalled).isTrue()
@@ -120,15 +83,4 @@ internal class RealSnapshotFileCacheBuilderTest {
         assertThat(readCalled).isTrue()
         assertThat(tempDir.resolve(filename).exists()).isTrue()
     }
-
-    private fun TestScope.createSnapshotFileCacheBuilder(
-        directory: File = tempDir,
-        filename: String = "testFile",
-    ) = RealSnapshotFileCacheBuilder(
-        directory,
-        filename,
-        FakeSnapshotFileCacheDataHandler::readDataFromFile,
-        FakeSnapshotFileCacheDataHandler::writeDataToFile,
-    ).dispatcher(UnconfinedTestDispatcher(testScheduler))
-        .telemeter(telemeter)
 }
