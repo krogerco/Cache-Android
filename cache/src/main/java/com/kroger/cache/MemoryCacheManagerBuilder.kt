@@ -73,24 +73,22 @@ public interface MemoryCacheManagerBuilder<K, V> {
     /**
      * It is important that the provided [coroutineScope] live as long as the
      * [MemoryCache][com.kroger.cache.internal.MemoryCache] is in use. Once the [coroutineScope]
-     * is cancelled no further changes to the [Cache] will be saved to the [snapshotPersistentCache].
+     * is cancelled no further changes to the [Cache] will be saved to the [SnapshotPersistentCache].
      *
-     * @param coroutineScope scope to use when periodically updating the [snapshotPersistentCache].
+     * @param coroutineScope scope to use when periodically updating the [SnapshotPersistentCache].
      */
     public fun coroutineScope(coroutineScope: CoroutineScope): MemoryCacheManagerBuilder<K, V>
 
-    /**
-     * The [SnapshotPersistentCache] where entries are periodically saved. If a [SnapshotPersistentCache]
-     * is provided a [coroutineScope] must be provided as well.
-     */
-    public fun snapshotPersistentCache(snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>): MemoryCacheManagerBuilder<K, V>
-
     public companion object {
         /**
-         * Creates a new [MemoryCacheManagerBuilder].
+         * Creates a [MemoryCacheManagerBuilder] using the given [snapshotPersistentCache].
+         *
+         * @param snapshotPersistentCache [SnapshotPersistentCache] where entries are periodically saved
          */
-        public operator fun <K, V> invoke(): MemoryCacheManagerBuilder<K, V> =
-            RealMemoryCacheManagerBuilder {
+        public fun <K, V> from(
+            snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null,
+        ): MemoryCacheManagerBuilder<K, V> =
+            RealMemoryCacheManagerBuilder(snapshotPersistentCache) {
                 System.currentTimeMillis()
             }
     }

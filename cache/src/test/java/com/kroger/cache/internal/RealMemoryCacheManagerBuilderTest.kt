@@ -36,7 +36,7 @@ internal class RealMemoryCacheManagerBuilderTest {
     @Test
     fun `given builder when saveFrequency set to invalid value then exception thrown`() = runTest {
         val exception = assertThrows<IllegalArgumentException> {
-            MemoryCacheManagerBuilder<String, String>().saveFrequency((-1).milliseconds)
+            MemoryCacheManagerBuilder.from<String, String>().saveFrequency((-1).milliseconds)
         }
 
         assertThat(exception.message).isEqualTo("saveFrequency must be >= 0: saveFrequency=-1 milliseconds")

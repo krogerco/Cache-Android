@@ -180,9 +180,11 @@ class SampleAppViewModel @Inject constructor(
     private fun createNewCache(cachePolicy: CachePolicy) {
         cacheCoroutineScope?.cancel()
         cacheCoroutineScope = CoroutineScope(EmptyCoroutineContext).also { scope ->
-            cache = MemoryCacheManagerBuilder.from<String, String>(application)
+            cache = MemoryCacheManagerBuilder.from(
+                application,
+                flowPersistentCache,
+            )
                 .coroutineScope(scope)
-                .snapshotPersistentCache(flowPersistentCache)
                 .cachePolicy(cachePolicy)
                 .saveFrequency(Duration.ZERO)
                 .build()

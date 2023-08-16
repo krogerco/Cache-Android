@@ -25,14 +25,17 @@ package com.kroger.cache.android.extensions
 
 import android.content.Context
 import com.kroger.cache.MemoryCacheManagerBuilder
+import com.kroger.cache.SnapshotPersistentCache
 import com.kroger.cache.android.internal.AndroidMemoryLevelNotifier
+import com.kroger.cache.internal.CacheEntry
 
 /**
  * Creates a [MemoryCacheManagerBuilder] that uses [AndroidMemoryLevelNotifier] to trim
  * the cache when low memory events are received.
- * @see com.kroger.cache.MemoryCacheManagerBuilder.invoke
+ * @see com.kroger.cache.MemoryCacheManagerBuilder.from
  */
 public fun <K, V> MemoryCacheManagerBuilder.Companion.from(
     context: Context,
-): MemoryCacheManagerBuilder<K, V> = MemoryCacheManagerBuilder<K, V>()
+    snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null,
+): MemoryCacheManagerBuilder<K, V> = from(snapshotPersistentCache)
     .memoryLevelNotifier(AndroidMemoryLevelNotifier(context))

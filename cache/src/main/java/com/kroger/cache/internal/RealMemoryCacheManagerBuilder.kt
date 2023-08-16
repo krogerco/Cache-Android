@@ -38,6 +38,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 internal class RealMemoryCacheManagerBuilder<K, V>(
+    private val snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null,
     private val timeProvider: TimeProvider,
 ) : MemoryCacheManagerBuilder<K, V> {
     private var saveFrequency: Duration = DEFAULT_SAVE_FREQUENCY
@@ -46,7 +47,6 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
     private var coroutineScope: CoroutineScope? = null
     private var memoryLevelNotifier: MemoryLevelNotifier? = null
     private var telemeter: Telemeter? = null
-    private var snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null
 
     override fun cachePolicy(cachePolicy: CachePolicy): MemoryCacheManagerBuilder<K, V> =
         apply {
@@ -79,11 +79,6 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
     override fun coroutineScope(coroutineScope: CoroutineScope): MemoryCacheManagerBuilder<K, V> =
         apply {
             this.coroutineScope = coroutineScope
-        }
-
-    override fun snapshotPersistentCache(snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            this.snapshotPersistentCache = snapshotPersistentCache
         }
 
     override fun build(): Cache<K, V> {

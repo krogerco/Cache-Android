@@ -423,7 +423,7 @@ internal class MemoryCacheManagerTest {
     }
     // endregion
 
-    private suspend fun <K, V> createMemoryCacheManager(
+    private fun <K, V> createMemoryCacheManager(
         snapshotPersistentCache: InMemorySnapshotPersistentCache<List<CacheEntry<K, V>>>?,
         scope: CoroutineScope = snapshotScope,
         dispatcher: CoroutineDispatcher = testDispatcher,
@@ -431,17 +431,14 @@ internal class MemoryCacheManagerTest {
         saveFrequency: Duration = defaultSaveFrequency,
         memoryLevelNotifier: MemoryLevelNotifier? = null,
     ): Cache<K, V> {
-        return RealMemoryCacheManagerBuilder<K, V>(
+        return RealMemoryCacheManagerBuilder(
+            snapshotPersistentCache,
             fakeTimeProvider,
         ).dispatcher(dispatcher)
             .coroutineScope(scope)
             .cachePolicy(cachePolicy)
             .saveFrequency(saveFrequency)
-            .memoryLevelNotifier(memoryLevelNotifier).also {
-                if (snapshotPersistentCache != null) {
-                    it.snapshotPersistentCache(snapshotPersistentCache)
-                }
-            }
+            .memoryLevelNotifier(memoryLevelNotifier)
             .build()
     }
 
