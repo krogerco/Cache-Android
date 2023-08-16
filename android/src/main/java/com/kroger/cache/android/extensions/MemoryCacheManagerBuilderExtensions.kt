@@ -28,7 +28,6 @@ import com.kroger.cache.MemoryCacheManagerBuilder
 import com.kroger.cache.SnapshotPersistentCache
 import com.kroger.cache.android.internal.AndroidMemoryLevelNotifier
 import com.kroger.cache.internal.CacheEntry
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * Creates a [MemoryCacheManagerBuilder] that uses [AndroidMemoryLevelNotifier] to trim
@@ -37,8 +36,6 @@ import kotlinx.coroutines.CoroutineScope
  */
 public fun <K, V> MemoryCacheManagerBuilder.Companion.from(
     context: Context,
-    coroutineScope: CoroutineScope,
-    snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>?,
-): MemoryCacheManagerBuilder<K, V> =
-    from(coroutineScope, snapshotPersistentCache)
-        .memoryLevelNotifier(AndroidMemoryLevelNotifier(context))
+    snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null,
+): MemoryCacheManagerBuilder<K, V> = from(snapshotPersistentCache)
+    .memoryLevelNotifier(AndroidMemoryLevelNotifier(context))

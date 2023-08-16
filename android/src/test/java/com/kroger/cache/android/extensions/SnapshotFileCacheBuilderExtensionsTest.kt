@@ -24,12 +24,10 @@
 package com.kroger.cache.android.extensions
 
 import android.content.Context
-import com.google.common.truth.Truth.assertThat
 import com.kroger.cache.SnapshotFileCacheBuilder
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.serializer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -40,32 +38,30 @@ internal class SnapshotFileCacheBuilderExtensionsTest {
     private lateinit var tempDir: File
 
     @Test
-    fun whenGenericTypeBuilderUsedThenCacheCreatedSuccessfully() = runBlocking {
+    fun whenGenericTypeBuilderUsedThenCacheCreatedSuccessfully() {
         val context = mockk<Context>()
         every { context.cacheDir } returns tempDir
 
-        val cacheResult = SnapshotFileCacheBuilder.from(
+        SnapshotFileCacheBuilder.from(
             context,
             "com.kroger.cache.android.test",
             { "" },
             { it.orEmpty().encodeToByteArray() },
         ).build()
-        assertThat(cacheResult.isSuccess).isTrue()
         verify(exactly = 1) { context.cacheDir }
     }
 
     @Test
-    fun whenGenericCacheEntryBuilderUsedThenCacheCreatedSuccessfully() = runBlocking {
+    fun whenGenericCacheEntryBuilderUsedThenCacheCreatedSuccessfully() {
         val context = mockk<Context>()
         every { context.cacheDir } returns tempDir
-        val cacheResult = SnapshotFileCacheBuilder.from(
+        SnapshotFileCacheBuilder.from(
             context,
             "com.kroger.cache.android.test",
             String.serializer(),
             String.serializer(),
         ).build()
 
-        assertThat(cacheResult.isSuccess).isTrue()
         verify(exactly = 1) { context.cacheDir }
     }
 }

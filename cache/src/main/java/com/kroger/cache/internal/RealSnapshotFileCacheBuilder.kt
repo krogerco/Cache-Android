@@ -26,10 +26,8 @@ package com.kroger.cache.internal
 import com.kroger.cache.SnapshotFileCacheBuilder
 import com.kroger.cache.SnapshotPersistentCache
 import com.kroger.telemetry.Telemeter
-import com.kroger.telemetry.relay.e
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 
 internal class RealSnapshotFileCacheBuilder<T>(
@@ -51,27 +49,12 @@ internal class RealSnapshotFileCacheBuilder<T>(
             this.telemeter = telemeter
         }
 
-    override suspend fun build(): Result<SnapshotPersistentCache<T>> = withContext(dispatcher) {
-        runCatching {
-            check(parentDirectory.exists() || parentDirectory.mkdirs()) {
-                "Unable to create cache directory=${parentDirectory.absolutePath}"
-            }
-
-            val cacheFile = parentDirectory.resolve(filename)
-            check(cacheFile.exists() || cacheFile.createNewFile()) {
-                "Unable to create cache file at: directory=${parentDirectory.absolutePath}, filename=$filename"
-            }
-
-            SnapshotFileCache(
-                cacheFile,
-                readDataFromFile,
-                writeDataToFile,
-                telemeter,
-                dispatcher,
-            )
-        }.onFailure {
-            val errorMessage = "An error occurred while creating the cache at: directory=${parentDirectory.absolutePath}, filename=$filename"
-            telemeter?.e("SnapshotFileCacheBuilder", errorMessage, it)
-        }
-    }
+    override fun build(): SnapshotPersistentCache<T> =
+        SnapshotFileCache(
+            parentDirectory.resolve(filename),
+            readDataFromFile,
+            writeDataToFile,
+            telemeter,
+            dispatcher,
+        )
 }

@@ -29,7 +29,9 @@ import com.kroger.cache.MemoryLevelNotifier
 import com.kroger.telemetry.Telemeter
 import com.kroger.telemetry.relay.i
 import com.kroger.telemetry.relay.w
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 
 private const val TAG = "MemoryLevelCacheManager"
 
@@ -46,15 +48,21 @@ internal class MemoryLevelCacheManagerDecorator<K, V>(
     private val memoryLevelNotifier: MemoryLevelNotifier,
     private val telemeter: Telemeter?,
 ) : Cache<K, V> by cacheManager {
+    private val coroutineScope: CoroutineScope = cacheManager.coroutineScope
+
     private val memoryLevelCallbacks = object : MemoryLevelCallbacks {
         override fun onLowMemory() {
-            cacheManager.trimMemory()
-            telemeter?.i(TAG, "Memory has reached a low level causing the cache to remove all expired entries.")
+            coroutineScope.launch {
+                cacheManager.trimMemory()
+                telemeter?.i(TAG, "Memory has reached a low level causing the cache to remove all expired entries.")
+            }
         }
 
         override fun onCriticalMemory() {
-            cacheManager.clear()
-            telemeter?.w(TAG, "Memory has reached a critical level causing the cache to be cleared.")
+            coroutineScope.launch {
+                cacheManager.clear()
+                telemeter?.w(TAG, "Memory has reached a critical level causing the cache to be cleared.")
+            }
         }
     }
 
@@ -63,7 +71,7 @@ internal class MemoryLevelCacheManagerDecorator<K, V>(
         // when the coroutineScope of the cacheManager completes we need to make sure
         // the memoryLevelCallbacks are removed to avoid leaking the cache in use cases
         // like android where a callback is registered on the application context.
-        cacheManager.coroutineScope.coroutineContext.job.invokeOnCompletion {
+        coroutineScope.coroutineContext.job.invokeOnCompletion {
             memoryLevelNotifier.memoryLevelCallbacks = null
         }
     }

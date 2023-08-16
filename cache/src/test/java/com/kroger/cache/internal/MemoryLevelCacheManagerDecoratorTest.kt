@@ -108,20 +108,20 @@ internal class MemoryLevelCacheManagerDecoratorTest {
         assertThat(fakeTelemeter.events.first().description).contains("Memory has reached a critical level causing the cache to be cleared.")
     }
 
-    private suspend fun <K, V> createMemoryCacheManager(
+    private fun <K, V> createMemoryCacheManager(
         snapshotPersistentCache: InMemorySnapshotPersistentCache<List<CacheEntry<K, V>>>?,
         scope: CoroutineScope,
         dispatcher: CoroutineDispatcher,
         cachePolicy: CachePolicy = CachePolicy(),
     ): Cache<K, V> {
-        return RealMemoryCacheManagerBuilder(
-            scope,
+        return RealMemoryCacheManagerBuilder<K, V>(
             snapshotPersistentCache,
             fakeTimeProvider,
         ).dispatcher(dispatcher)
-            .cachePolicy(cachePolicy)
+            .coroutineScope(scope)
             .telemeter(fakeTelemeter)
             .memoryLevelNotifier(fakeMemoryLevelNotifier)
+            .cachePolicy(cachePolicy)
             .build()
     }
 }

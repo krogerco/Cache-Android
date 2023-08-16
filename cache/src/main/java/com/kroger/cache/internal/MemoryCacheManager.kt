@@ -28,6 +28,7 @@ import com.kroger.cache.CachePolicy
 import com.kroger.cache.SnapshotPersistentCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,12 +36,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
 
 internal typealias TimeProvider = () -> Long
 
 internal class MemoryCacheManager<K, V>(
-    private val memoryCache: MemoryCache<K, CacheEntry<K, V>>,
     private val snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>?,
     private val cachePolicy: CachePolicy,
     private val timeProvider: TimeProvider,
@@ -48,7 +51,9 @@ internal class MemoryCacheManager<K, V>(
     dispatcher: CoroutineDispatcher,
     saveFrequency: Duration,
 ) : Cache<K, V> {
-    private val lock = Object()
+    private lateinit var memoryCache: MemoryCache<K, CacheEntry<K, V>>
+    private val mutex = Mutex()
+    private val initializerJob: Job
     private val cacheChanges = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val temporalExpirationMillisFunc: ((CacheEntry<K, V>) -> Long)?
     private val temporalLimitMillis: Long
@@ -69,27 +74,38 @@ internal class MemoryCacheManager<K, V>(
             }
         }
 
-        if (snapshotPersistentCache != null) {
-            cacheChanges
-                .onEach {
-                    delay(saveFrequency)
-                    updateSnapshotPersistentCache()
-                }
-                .onCompletion {
-                    updateSnapshotPersistentCache()
-                }
-                .flowOn(dispatcher)
-                .launchIn(coroutineScope)
-        }
+        initializerJob = coroutineScope.launch(dispatcher) {
+            val sortByProperty = cachePolicy.sortByProperty<K, V>()
 
-        trimToSize()
+            // the new cache policy may require a new sort order
+            val allEntries = snapshotPersistentCache?.read().orEmpty().sortedBy(sortByProperty)
+            val initialCapacity = maxOf(allEntries.size, MemoryCache.DEFAULT_INITIAL_CAPACITY)
+            memoryCache = MemoryCache(initialCapacity, accessOrder = cachePolicy.hasTtiPolicy)
+            allEntries.forEach { memoryCache.put(it.key, it) }
+
+            if (snapshotPersistentCache != null) {
+                cacheChanges
+                    .onEach {
+                        delay(saveFrequency)
+                        updateSnapshotPersistentCache()
+                    }
+                    .onCompletion {
+                        updateSnapshotPersistentCache()
+                    }
+                    .flowOn(dispatcher)
+                    .launchIn(coroutineScope)
+            }
+
+            trimToSize()
+        }
     }
 
-    override fun get(key: K): V? = synchronized(lock) {
+    override suspend fun get(key: K): V? = mutex.withLock {
+        initializerJob.join()
         memoryCache.get(key)?.let { cachedEntry ->
             val lastAccessDate = timeProvider()
             if (isEntryExpired(cachedEntry, lastAccessDate)) {
-                remove(key)
+                handleRemove(key)
                 null
             } else {
                 val newEntry = cachedEntry.copy(lastAccessDate = lastAccessDate)
@@ -100,19 +116,21 @@ internal class MemoryCacheManager<K, V>(
         }
     }
 
-    override fun put(key: K, value: V): Unit = synchronized(lock) {
+    override suspend fun put(key: K, value: V): Unit = mutex.withLock {
+        initializerJob.join()
         insertOrUpdate(key, value)
         cacheChanges.tryEmit(Unit)
     }
 
-    override fun putAll(pairs: Iterable<Pair<K, V>>): Unit = synchronized(lock) {
+    override suspend fun putAll(pairs: Iterable<Pair<K, V>>): Unit = mutex.withLock {
+        initializerJob.join()
         pairs.forEach { (key, value) ->
             insertOrUpdate(key, value)
         }
         cacheChanges.tryEmit(Unit)
     }
 
-    private fun insertOrUpdate(key: K, value: V): Unit = synchronized(lock) {
+    private suspend fun insertOrUpdate(key: K, value: V) {
         // An entry's insertion order is not affected by updating a value for a key that already exists in a
         // LinkedHashMap. Removing the entry first ensures an update moves an entry to the back of the LRU list.
         memoryCache.remove(key)
@@ -122,12 +140,18 @@ internal class MemoryCacheManager<K, V>(
         trimToSize()
     }
 
-    override fun remove(key: K): Unit = synchronized(lock) {
+    override suspend fun remove(key: K): Unit = mutex.withLock {
+        initializerJob.join()
+        handleRemove(key)
+    }
+
+    private suspend fun handleRemove(key: K) {
         memoryCache.remove(key)
         cacheChanges.tryEmit(Unit)
     }
 
-    override fun clear(): Unit = synchronized(lock) {
+    override suspend fun clear(): Unit = mutex.withLock {
+        initializerJob.join()
         memoryCache.clear()
         cacheChanges.tryEmit(Unit)
     }
@@ -135,7 +159,8 @@ internal class MemoryCacheManager<K, V>(
     /**
      * Applies the temporal policy from the [cachePolicy] if one exists to remove expired entries.
      */
-    internal fun trimMemory(): Unit = synchronized(lock) {
+    internal suspend fun trimMemory(): Unit = mutex.withLock {
+        initializerJob.join()
         applyTemporalPolicy()
         cacheChanges.tryEmit(Unit)
     }
@@ -179,7 +204,7 @@ internal class MemoryCacheManager<K, V>(
             return
         }
 
-        val cacheEntries = synchronized(lock) {
+        val cacheEntries = mutex.withLock {
             memoryCache.getAll().map { it.value }
         }
 
@@ -206,3 +231,10 @@ private fun <T> MutableIterator<T>.drop(n: Int) {
         count++
     }
 }
+
+private fun <K, V> CachePolicy.sortByProperty(): (CacheEntry<K, V>) -> Long =
+    if (hasTtiPolicy) {
+        CacheEntry<K, V>::lastAccessDate::get
+    } else {
+        CacheEntry<K, V>::creationDate::get
+    }

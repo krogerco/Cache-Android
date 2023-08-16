@@ -148,15 +148,15 @@ class SampleAppViewModel @Inject constructor(
     }
 
     fun deleteEntry(key: String) {
-        cache.remove(key)
+        viewModelScope.launch { cache.remove(key) }
     }
 
-    fun getEntry(key: String): String? {
-        return cache.get(key)
+    fun getEntry(key: String) {
+        viewModelScope.launch { cache.get(key) }
     }
 
     fun updateEntryWithRandomValue(key: String) {
-        cache.put(key, UUID.randomUUID().toString())
+        viewModelScope.launch { cache.put(key, UUID.randomUUID().toString()) }
     }
 
     private fun updateCacheConfigState(cacheConfig: CacheConfig) {
@@ -177,14 +177,14 @@ class SampleAppViewModel @Inject constructor(
         }
     }
 
-    private suspend fun createNewCache(cachePolicy: CachePolicy) {
+    private fun createNewCache(cachePolicy: CachePolicy) {
         cacheCoroutineScope?.cancel()
         cacheCoroutineScope = CoroutineScope(EmptyCoroutineContext).also { scope ->
             cache = MemoryCacheManagerBuilder.from(
                 application,
-                scope,
                 flowPersistentCache,
             )
+                .coroutineScope(scope)
                 .cachePolicy(cachePolicy)
                 .saveFrequency(Duration.ZERO)
                 .build()

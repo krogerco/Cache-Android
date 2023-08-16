@@ -40,7 +40,7 @@ import java.io.File
  * For any single [File] only one [SnapshotPersistentCache] should exist at a time.
  */
 public interface SnapshotFileCacheBuilder<T> {
-    public suspend fun build(): Result<SnapshotPersistentCache<T>>
+    public fun build(): SnapshotPersistentCache<T>
 
     /**
      * The [CoroutineDispatcher] to use when doing [File] I/O.
