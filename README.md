@@ -37,26 +37,27 @@ val fileCache = SnapshotFileCacheBuilder.from(
     filename = "cacheFile.json", // cache file created in application's cache directory
     keySerializer = String.serializer(), // serializer for cache keys
     valueSerializer = String.serializer(), // serializer for cache values
-).build().getOrThrow()
+).build()
 ```
 
 Once the `fileCache` is created a `MemoryCacheManager` can then be created that utilizes it.
 ```kotlin
 cache = MemoryCacheManagerBuilder.from(
     context, // application context
-    scope, // CoroutineScope used to periodically save the cache
     fileCache, // persistent cache to periodically save cache entries to
-).build()
+)
+    .coroutineScope(coroutineScope) // CoroutineScope used to periodically save the cache
+    .build()
 ```
 
 Use the `cache`.
 
 ```kotlin
 // add a value to the cache
-cache["newKey"] = computeExpensiveValue()
+cache.put("newKey", computeExpensiveValue())
 
 // ...somewhere else retrieve and use the value
-val expensiveValue = cache["newKey"]
+val expensiveValue = cache.get("newKey")
 println(expensiveValue)
 ```
 
@@ -107,9 +108,10 @@ A `MemoryCacheManager` can be created using one of the builder factory functions
 ```kotlin
 val cache = MemoryCacheManagerBuilder.from(
     context, // application context
-    coroutineScope,
     snapshotPersistentCache = fileCache, // see Cache Configuration section for an example
-).build()
+)
+    .coroutineScope(coroutineScope)
+    .build()
 ```
 
 When retrieving an entry from the `Cache` an expired entry will never be returned.
