@@ -1,0 +1,15 @@
+name: Commit
+
+on: [ push, workflow_dispatch ]
+
+jobs:
+  semantic_library_workflow:
+    name: push
+    uses: krogerco/Shared-CI-Workflow-Android/.github/workflows/semantic_library_workflow.yml@v1.0.0
+    secrets:
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralUsername }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralPassword }}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKey }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKeyId }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKeyPassword }}
+      REPO_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

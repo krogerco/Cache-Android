@@ -1,0 +1,11 @@
+root = true
+
+[*.{kt,kts}]
+disabled_rules = filename
+max_line_length = off
+insert_final_newline = true
+ij_kotlin_name_count_to_use_star_import = 999
+ij_kotlin_name_count_to_use_star_import_for_members = 999
+ij_java_class_count_to_use_import_on_demand = 999
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
