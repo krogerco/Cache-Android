@@ -21,18 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+plugins {
+    `java-library-module`
+    `release-module`
+    kotlin("plugin.serialization")
+}
 
-/**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
- */
-public data class CacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-)
+dependencies {
+    api(project(":cache"))
+    api(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.jupiter.api)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
+    testRuntimeOnly(libs.jupiter.engine)
+}

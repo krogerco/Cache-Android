@@ -21,18 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
+
+import com.kroger.cache.internal.CacheEntry
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 /**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
+ * [KSerializer] instance to map [CacheEntry] via KotlinX Serialization
  */
-public data class CacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-)
+public class KotlinCacheEntrySerializer<K, V>(private val keySerializer: KSerializer<K>, private val valueSerializer: KSerializer<V>) : KSerializer<CacheEntry<K, V>> {
+    override val descriptor: SerialDescriptor
+        get() = KotlinCacheEntry.serializer(keySerializer, valueSerializer).descriptor
+
+    override fun serialize(encoder: Encoder, value: CacheEntry<K, V>) {
+        val surrogate = KotlinCacheEntry.build(value)
+        return encoder.encodeSerializableValue(KotlinCacheEntry.serializer(keySerializer, valueSerializer), surrogate)
+    }
+
+    override fun deserialize(decoder: Decoder): CacheEntry<K, V> {
+        val surrogate = decoder.decodeSerializableValue(KotlinCacheEntry.serializer(keySerializer, valueSerializer))
+        return surrogate.toCacheEntry()
+    }
+}

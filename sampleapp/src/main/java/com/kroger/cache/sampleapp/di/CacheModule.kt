@@ -28,6 +28,8 @@ import com.kroger.cache.SnapshotFileCacheBuilder
 import com.kroger.cache.SnapshotPersistentCache
 import com.kroger.cache.android.extensions.from
 import com.kroger.cache.internal.CacheEntry
+import com.kroger.cache.kotlinx.KotlinXCacheListSerializer
+import com.kroger.cache.kotlinx.KotlinXCacheSerializer
 import com.kroger.cache.sampleapp.CacheConfig
 import com.kroger.cache.sampleapp.FlowPersistentCache
 import dagger.Module
@@ -47,7 +49,7 @@ class CacheModule {
         SnapshotFileCacheBuilder.from(
             context,
             filename = "cacheConfig.json",
-            valueSerializer = CacheConfig.serializer(),
+            valueSerializer = KotlinXCacheSerializer(serializer = CacheConfig.serializer()),
         ).build()
 
     @Provides
@@ -57,8 +59,7 @@ class CacheModule {
         SnapshotFileCacheBuilder.from(
             context,
             filename = "cacheFile.json",
-            keySerializer = String.serializer(),
-            valueSerializer = String.serializer(),
+            valueSerializer = KotlinXCacheListSerializer(keySerializer = String.serializer(), valueSerializer = String.serializer()),
         ).build()
 
     @Provides

@@ -24,11 +24,8 @@
 package com.kroger.cache.android.extensions
 
 import android.content.Context
+import com.kroger.cache.CacheSerializer
 import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.internal.CacheEntry
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.StringFormat
-import kotlinx.serialization.json.Json
 
 private val SnapshotFileCacheBuilder.Companion.defaultCacheDir: String
     get() = "com.kroger.cache"
@@ -59,32 +56,10 @@ public fun <T> SnapshotFileCacheBuilder.Companion.from(
 public fun <T> SnapshotFileCacheBuilder.Companion.from(
     context: Context,
     filename: String,
-    valueSerializer: KSerializer<T>,
-    formatter: StringFormat = Json,
+    valueSerializer: CacheSerializer<T>,
 ): SnapshotFileCacheBuilder<T> =
     from(
         context.cacheDir.resolve(defaultCacheDir),
         filename,
         valueSerializer,
-        formatter,
-    )
-
-/**
- * Convenience function to create a [SnapshotFileCacheBuilder] in the application's cache directory.
- * This will create the cache file at {[Context.getCacheDir]}/com.kroger.cache/{[filename]}
- * @see [com.kroger.cache.SnapshotFileCacheBuilder.Companion.from]
- */
-public fun <K, V> SnapshotFileCacheBuilder.Companion.from(
-    context: Context,
-    filename: String,
-    keySerializer: KSerializer<K>,
-    valueSerializer: KSerializer<V>,
-    formatter: StringFormat = Json,
-): SnapshotFileCacheBuilder<List<CacheEntry<K, V>>> =
-    from(
-        context.cacheDir.resolve(defaultCacheDir),
-        filename,
-        keySerializer,
-        valueSerializer,
-        formatter,
     )

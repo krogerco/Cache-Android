@@ -24,13 +24,10 @@
 plugins {
     `java-library-module`
     `release-module`
-    kotlin("plugin.serialization")
 }
 
 dependencies {
     implementation(libs.kotlinx.coroutines)
-    api(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
     api(libs.telemetry)
 
     testImplementation(libs.jupiter.api)

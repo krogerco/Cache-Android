@@ -21,18 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache
 
 /**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
+ * Abstraction for serialization
+ * Implementing classes should be created their own modules so that consumers may compose their preferred implementations
  */
-public data class CacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-)
+public interface CacheSerializer<T> {
+    public fun decodeFromString(bytes: ByteArray?): T?
+    public fun toByteArray(data: T?): ByteArray
+}

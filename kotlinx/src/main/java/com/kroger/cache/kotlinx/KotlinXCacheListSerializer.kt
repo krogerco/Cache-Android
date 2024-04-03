@@ -21,18 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
+
+import com.kroger.cache.CacheSerializer
+import com.kroger.cache.internal.CacheEntry
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 
 /**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
+ * [KSerializer] instance to map a list of [CacheEntry] values via KotlinX Serialization
  */
-public data class CacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-)
+public class KotlinXCacheListSerializer<K, V>(
+    private val formatter: StringFormat = Json,
+    keySerializer: KSerializer<K>,
+    valueSerializer: KSerializer<V>,
+) : CacheSerializer<List<CacheEntry<K, V>>> {
+    private val listSerializer = ListSerializer(KotlinCacheEntrySerializer(keySerializer, valueSerializer))
+
+    override fun decodeFromString(bytes: ByteArray?): List<CacheEntry<K, V>>? =
+        if (bytes == null || bytes.isEmpty()) {
+            null
+        } else {
+            formatter.decodeFromString(listSerializer, bytes.decodeToString())
+        }
+
+    override fun toByteArray(data: List<CacheEntry<K, V>>?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        formatter.encodeToString(listSerializer, data).encodeToByteArray()
+    }
+}

@@ -21,18 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
 
-/**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
- */
-public data class CacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-)
+import com.google.common.truth.Truth.assertThat
+import kotlinx.serialization.builtins.serializer
+import org.junit.jupiter.api.Test
+
+class KotlinXSerializerTest {
+
+    @Test
+    fun `Given a KotlinXCacheSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinXCacheSerializer(serializer = KotlinCacheEntrySerializer<String, Int>(String.serializer(), Int.serializer()))
+
+        val result = serializer.toByteArray(null)
+
+        assertThat(result).isInstanceOf(ByteArray::class.java)
+        assertThat(result.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Given a KotlinXCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinXCacheListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
+
+        val result = serializer.toByteArray(null)
+
+        assertThat(result).isInstanceOf(ByteArray::class.java)
+        assertThat(result.size).isEqualTo(0)
+    }
+}

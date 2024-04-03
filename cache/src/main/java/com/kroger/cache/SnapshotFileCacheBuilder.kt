@@ -23,14 +23,9 @@
  */
 package com.kroger.cache
 
-import com.kroger.cache.internal.CacheEntry
 import com.kroger.cache.internal.RealSnapshotFileCacheBuilder
 import com.kroger.telemetry.Telemeter
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.StringFormat
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
 import java.io.File
 
 /**
@@ -77,81 +72,41 @@ public interface SnapshotFileCacheBuilder<T> {
             )
 
         /**
-         * This is a convenience function to create a [SnapshotFileCacheBuilder] that uses [StringFormat]
-         * from the kotlinx serialization library and creates a [SnapshotPersistentCache] compatible with
-         * a [MemoryCacheManagerBuilder].
+         * This is a convenience function to create a [SnapshotFileCacheBuilder] that uses an implementation of [CacheSerializer]
+         * to read and write to the cache [File].
          *
          * @param parentDirectory the directory to create and save the cache file in. On Android it is
          * recommended to be somewhere in the cache directory such as Context.getCacheDir.
          * @param filename this should be in the form of "com.example.module.feature".
          * It is important for the filename to be unique across all [Cache] instances.
-         * @param keySerializer serializer and deserializer for cache keys
-         * @param valueSerializer serializer and deserializer for cache values
-         * @param formatter [StringFormat] to use when doing [File] I/O.
-         * Defaults to [Json][kotlinx.serialization.json.Json].
-         */
-        public fun <K, V> from(
-            parentDirectory: File,
-            filename: String,
-            keySerializer: KSerializer<K>,
-            valueSerializer: KSerializer<V>,
-            formatter: StringFormat = Json,
-        ): SnapshotFileCacheBuilder<List<CacheEntry<K, V>>> {
-            val cacheEntrySerializer = ListSerializer(CacheEntry.serializer(keySerializer, valueSerializer))
-            return RealSnapshotFileCacheBuilder(
-                parentDirectory,
-                filename,
-                DefaultFileReader(cacheEntrySerializer, formatter),
-                DefaultFileWriter(cacheEntrySerializer, formatter),
-            )
-        }
-
-        /**
-         * This is a convenience function to create a [SnapshotFileCacheBuilder] that uses [StringFormat]
-         * from the kotlinx serialization library to read and write to the cache [File].
-         *
-         * @param parentDirectory the directory to create and save the cache file in. On Android it is
-         * recommended to be somewhere in the cache directory such as Context.getCacheDir.
-         * @param filename this should be in the form of "com.example.module.feature".
-         * It is important for the filename to be unique across all [Cache] instances.
-         * @param valueSerializer serializer and deserializer for cache values
-         * @param formatter [StringFormat] to use when doing [File] I/O.
-         * Defaults to [Json][kotlinx.serialization.json.Json].
+         * @param valueSerializer an implementation of [CacheSerializer]
          */
         public fun <T> from(
             parentDirectory: File,
             filename: String,
-            valueSerializer: KSerializer<T>,
-            formatter: StringFormat = Json,
+            valueSerializer: CacheSerializer<T>,
         ): SnapshotFileCacheBuilder<T> = from(
             parentDirectory,
             filename,
-            DefaultFileReader(valueSerializer, formatter),
-            DefaultFileWriter(valueSerializer, formatter),
+            DefaultFileReader(valueSerializer),
+            DefaultFileWriter(valueSerializer),
         )
     }
 }
 
 private class DefaultFileReader<T>(
-    private val serializer: KSerializer<T>,
-    private val formatter: StringFormat,
+    private val serializer: CacheSerializer<T>,
 ) : (ByteArray?) -> T? {
-    override fun invoke(bytes: ByteArray?): T? =
-        if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            formatter.decodeFromString(serializer, bytes.decodeToString())
-        }
+    override fun invoke(bytes: ByteArray?): T? = serializer.decodeFromString(bytes)
 }
 
 private class DefaultFileWriter<T>(
-    private val serializer: KSerializer<T>,
-    private val formatter: StringFormat,
+    private val serializer: CacheSerializer<T>,
 ) : (T?) -> ByteArray {
     override fun invoke(data: T?): ByteArray =
         if (data == null) {
             ByteArray(0)
         } else {
-            formatter.encodeToString(serializer, data).encodeToByteArray()
+            serializer.toByteArray(data)
         }
 }

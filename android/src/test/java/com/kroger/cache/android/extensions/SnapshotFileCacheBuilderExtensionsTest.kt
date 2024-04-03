@@ -25,6 +25,8 @@ package com.kroger.cache.android.extensions
 
 import android.content.Context
 import com.kroger.cache.SnapshotFileCacheBuilder
+import com.kroger.cache.kotlinx.KotlinCacheEntrySerializer
+import com.kroger.cache.kotlinx.KotlinXCacheSerializer
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -58,8 +60,7 @@ internal class SnapshotFileCacheBuilderExtensionsTest {
         SnapshotFileCacheBuilder.from(
             context,
             "com.kroger.cache.android.test",
-            String.serializer(),
-            String.serializer(),
+            KotlinXCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), String.serializer())),
         ).build()
 
         verify(exactly = 1) { context.cacheDir }

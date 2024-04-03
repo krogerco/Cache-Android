@@ -21,18 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
+
+import com.kroger.cache.internal.CacheEntry
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
+ * Wrapper for [CacheEntry] to enable KotlinX Serialization
  * @property key the key for this entry
  * @property value the value for this entry
  * @property creationDate when this entry was created in milliseconds since epoch
  * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
  */
-public data class CacheEntry<K, V>(
+@Serializable
+@SerialName("CacheEntry")
+public data class KotlinCacheEntry<K, V>(
     val key: K,
     val value: V,
     val creationDate: Long,
     val lastAccessDate: Long,
-)
+) {
+
+    public fun toCacheEntry(): CacheEntry<K, V> = CacheEntry(key, value, creationDate, lastAccessDate)
+
+    public companion object {
+        public fun <K, V> build(cacheEntry: CacheEntry<K, V>): KotlinCacheEntry<K, V> =
+            KotlinCacheEntry(
+                cacheEntry.key,
+                cacheEntry.value,
+                cacheEntry.creationDate,
+                cacheEntry.lastAccessDate,
+            )
+    }
+}

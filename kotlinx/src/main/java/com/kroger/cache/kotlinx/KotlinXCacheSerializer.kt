@@ -21,18 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
+
+import com.kroger.cache.CacheSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.json.Json
 
 /**
- * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
+ * Implementation of [CacheSerializer] for KotlinX Serialization
+ *
+ * @property formatter the [StringFormat] for encoding. Defaults to [Json]
+ * @property serializer the [KSerializer] instance for serialization
  */
-public data class CacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-)
+public class KotlinXCacheSerializer<T> public constructor(
+    private val formatter: StringFormat = Json,
+    private val serializer: KSerializer<T>,
+) : CacheSerializer<T> {
+    override fun decodeFromString(bytes: ByteArray?): T? =
+        if (bytes == null || bytes.isEmpty()) {
+            null
+        } else {
+            formatter.decodeFromString(serializer, bytes.decodeToString())
+        }
+
+    override fun toByteArray(data: T?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        formatter.encodeToString(serializer, data).encodeToByteArray()
+    }
+}
