@@ -46,8 +46,8 @@ internal class RealSnapshotFileCacheBuilderTest {
             KotlinCacheListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer()),
         ).build()
 
-        val entry1 = CacheEntry("1", 1, 1000L, 0L)
-        val entry2 = CacheEntry("2", 2, 0L, 0L)
+        val entry1 = CacheEntry("1", 1, 1000L, 1000L)
+        val entry2 = CacheEntry("2", 2, 1000L, 1000L)
 
         val entries = listOf(entry1, entry2)
         fileCache.save(entries)
@@ -67,7 +67,7 @@ internal class RealSnapshotFileCacheBuilderTest {
             KotlinCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer())),
         ).build()
 
-        val entry = CacheEntry("1", 1, 0L, 0L)
+        val entry = CacheEntry("1", 1, 1000L, 1000L)
         fileCache.save(entry)
 
         val readEntry = fileCache.read()
