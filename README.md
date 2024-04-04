@@ -21,14 +21,14 @@ In an application there is often a need to make data that is expensive to retrie
 ### Adding Dependencies
 The core cache module contains an abstraction for serialization, and requires that an implementing module also be included, or a local implementation be created.
 Serialization implementations can be composed with the android module to provide the features of both.
-Currently, a KotlinX Serialization implementation is provided.
+Currently, a kotlinx serialization implementation is provided.
 
 The cache library modules are published on Maven Central and can be included as follows:
 ```kotlin
 // core module
 implementation("com.kroger.cache:cache:<version>")
 
-// kotlinX serialization  (core module is already included)
+// kotlinx serialization  (core module is already included)
 implementation("com.kroger.cache:kotlinx:<version>")
 
 // if using android (core module is already included)
@@ -38,12 +38,12 @@ implementation("com.kroger.cache:android:<version>")
 ### Cache Configuration
 Each serialization implementation comes with a default file persistence implementation
 
-#### KotlinX Serialization
+#### kotlinx serialization
 ```kotlin
 val fileCache = SnapshotFileCacheBuilder.from(
     context, // application context used to reference application cache directory on Android
     filename = "cacheFile.json", // cache file created in application's cache directory
-    KotlinXCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer())), // implementation of CacheSerializer
+    KotlinCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer())), // implementation of CacheSerializer
 ).build()
 ```
 
@@ -82,7 +82,7 @@ The library provides an implementation of `SnapshotPersistentCache` that saves t
 
 Each serialization implementation provides tooling to save data to a file, via the `CacheSerializer` interface
 
-#### KotlinX Serialization
+#### kotlinx serialization
 Saves data to the file using a `StringFormat` from `kotlinx.serialization` defaulting to `Json`. A builder factory function overload is provided so a custom serialization strategy can be used. All that is required is 
 
 > **Note**: Only one `SnapshotPersistentCache` should exist at a time that references any given file.

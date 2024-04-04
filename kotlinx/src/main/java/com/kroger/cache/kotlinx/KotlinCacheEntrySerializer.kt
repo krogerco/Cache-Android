@@ -25,24 +25,53 @@ package com.kroger.cache.kotlinx
 
 import com.kroger.cache.internal.CacheEntry
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 
 /**
- * [KSerializer] instance to map [CacheEntry] via KotlinX Serialization
+ * [KSerializer] instance to map [CacheEntry] via kotlinx serialization
  */
 public class KotlinCacheEntrySerializer<K, V>(private val keySerializer: KSerializer<K>, private val valueSerializer: KSerializer<V>) : KSerializer<CacheEntry<K, V>> {
-    override val descriptor: SerialDescriptor
-        get() = KotlinCacheEntry.serializer(keySerializer, valueSerializer).descriptor
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CacheEntry") {
+        element("key", keySerializer.descriptor)
+        element("value", valueSerializer.descriptor)
+        element("creationDate", PrimitiveSerialDescriptor("creationDate", PrimitiveKind.LONG))
+        element("lastAccessDate", PrimitiveSerialDescriptor("lastAccessDate", PrimitiveKind.LONG))
+    }
 
     override fun serialize(encoder: Encoder, value: CacheEntry<K, V>) {
-        val surrogate = KotlinCacheEntry.build(value)
-        return encoder.encodeSerializableValue(KotlinCacheEntry.serializer(keySerializer, valueSerializer), surrogate)
+        encoder.encodeStructure(descriptor) {
+            encodeSerializableElement(descriptor, 0, keySerializer, value.key)
+            encodeSerializableElement(descriptor, 1, valueSerializer, value.value)
+            encodeLongElement(descriptor, 2, value.creationDate)
+            encodeLongElement(descriptor, 3, value.lastAccessDate)
+        }
     }
 
-    override fun deserialize(decoder: Decoder): CacheEntry<K, V> {
-        val surrogate = decoder.decodeSerializableValue(KotlinCacheEntry.serializer(keySerializer, valueSerializer))
-        return surrogate.toCacheEntry()
-    }
+    override fun deserialize(decoder: Decoder): CacheEntry<K, V> =
+        decoder.decodeStructure(descriptor) {
+            var key: K? = null
+            var value: V? = null
+            var creationDate = 0L
+            var lastAccessDate = 0L
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    0 -> key = decodeSerializableElement(descriptor, 0, keySerializer)
+                    1 -> value = decodeSerializableElement(descriptor, 1, valueSerializer)
+                    2 -> creationDate = decodeLongElement(descriptor, 2)
+                    3 -> lastAccessDate = decodeLongElement(descriptor, 2)
+                    CompositeDecoder.DECODE_DONE -> break
+                    else -> error("Unexpected index: $index")
+                }
+            }
+            require(key != null && value != null && creationDate != 0L && lastAccessDate != 0L)
+            CacheEntry(key, value, creationDate, lastAccessDate)
+        }
 }

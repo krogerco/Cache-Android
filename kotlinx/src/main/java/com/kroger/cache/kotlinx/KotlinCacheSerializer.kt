@@ -23,35 +23,31 @@
  */
 package com.kroger.cache.kotlinx
 
-import com.kroger.cache.internal.CacheEntry
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.kroger.cache.CacheSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.json.Json
 
 /**
- * Wrapper for [CacheEntry] to enable KotlinX Serialization
- * @property key the key for this entry
- * @property value the value for this entry
- * @property creationDate when this entry was created in milliseconds since epoch
- * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
+ * Implementation of [CacheSerializer] for kotlinx Serialization
+ *
+ * @property formatter the [StringFormat] for encoding. Defaults to [Json]
+ * @property serializer the [KSerializer] instance for serialization
  */
-@Serializable
-@SerialName("CacheEntry")
-public data class KotlinCacheEntry<K, V>(
-    val key: K,
-    val value: V,
-    val creationDate: Long,
-    val lastAccessDate: Long,
-) {
+public class KotlinCacheSerializer<T> public constructor(
+    private val formatter: StringFormat = Json,
+    private val serializer: KSerializer<T>,
+) : CacheSerializer<T> {
+    override fun decodeFromString(bytes: ByteArray?): T? =
+        if (bytes == null || bytes.isEmpty()) {
+            null
+        } else {
+            formatter.decodeFromString(serializer, bytes.decodeToString())
+        }
 
-    public fun toCacheEntry(): CacheEntry<K, V> = CacheEntry(key, value, creationDate, lastAccessDate)
-
-    public companion object {
-        public fun <K, V> build(cacheEntry: CacheEntry<K, V>): KotlinCacheEntry<K, V> =
-            KotlinCacheEntry(
-                cacheEntry.key,
-                cacheEntry.value,
-                cacheEntry.creationDate,
-                cacheEntry.lastAccessDate,
-            )
+    override fun toByteArray(data: T?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        formatter.encodeToString(serializer, data).encodeToByteArray()
     }
 }

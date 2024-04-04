@@ -30,8 +30,8 @@ import org.junit.jupiter.api.Test
 class KotlinXSerializerTest {
 
     @Test
-    fun `Given a KotlinXCacheSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
-        val serializer = KotlinXCacheSerializer(serializer = KotlinCacheEntrySerializer<String, Int>(String.serializer(), Int.serializer()))
+    fun `Given a kotlinxCacheSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer()))
 
         val result = serializer.toByteArray(null)
 
@@ -40,8 +40,8 @@ class KotlinXSerializerTest {
     }
 
     @Test
-    fun `Given a KotlinXCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
-        val serializer = KotlinXCacheListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
+    fun `Given a kotlinxCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinCacheListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
 
         val result = serializer.toByteArray(null)
 

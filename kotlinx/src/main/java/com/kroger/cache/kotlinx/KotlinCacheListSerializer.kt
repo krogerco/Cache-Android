@@ -24,30 +24,32 @@
 package com.kroger.cache.kotlinx
 
 import com.kroger.cache.CacheSerializer
+import com.kroger.cache.internal.CacheEntry
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 /**
- * Implementation of [CacheSerializer] for KotlinX Serialization
- *
- * @property formatter the [StringFormat] for encoding. Defaults to [Json]
- * @property serializer the [KSerializer] instance for serialization
+ * [KSerializer] instance to map a list of [CacheEntry] values via kotlinx serialization
  */
-public class KotlinXCacheSerializer<T> public constructor(
+public class KotlinCacheListSerializer<K, V>(
     private val formatter: StringFormat = Json,
-    private val serializer: KSerializer<T>,
-) : CacheSerializer<T> {
-    override fun decodeFromString(bytes: ByteArray?): T? =
+    keySerializer: KSerializer<K>,
+    valueSerializer: KSerializer<V>,
+) : CacheSerializer<List<CacheEntry<K, V>>> {
+    private val listSerializer = ListSerializer(KotlinCacheEntrySerializer(keySerializer, valueSerializer))
+
+    override fun decodeFromString(bytes: ByteArray?): List<CacheEntry<K, V>>? =
         if (bytes == null || bytes.isEmpty()) {
             null
         } else {
-            formatter.decodeFromString(serializer, bytes.decodeToString())
+            formatter.decodeFromString(listSerializer, bytes.decodeToString())
         }
 
-    override fun toByteArray(data: T?): ByteArray = if (data == null) {
+    override fun toByteArray(data: List<CacheEntry<K, V>>?): ByteArray = if (data == null) {
         ByteArray(0)
     } else {
-        formatter.encodeToString(serializer, data).encodeToByteArray()
+        formatter.encodeToString(listSerializer, data).encodeToByteArray()
     }
 }

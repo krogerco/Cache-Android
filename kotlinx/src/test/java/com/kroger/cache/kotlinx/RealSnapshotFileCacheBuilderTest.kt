@@ -43,12 +43,15 @@ internal class RealSnapshotFileCacheBuilderTest {
         val fileCache = SnapshotFileCacheBuilder.from(
             tempDir,
             "testFile",
-            KotlinXCacheListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer()),
+            KotlinCacheListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer()),
         ).build()
-        val entry1 = CacheEntry("1", 1, 0L, 0L)
+
+        val entry1 = CacheEntry("1", 1, 1000L, 0L)
         val entry2 = CacheEntry("2", 2, 0L, 0L)
+
         val entries = listOf(entry1, entry2)
         fileCache.save(entries)
+
         val readEntries = fileCache.read()
         assertThat(readEntries).containsExactlyElementsIn(entries).inOrder()
 
@@ -61,10 +64,12 @@ internal class RealSnapshotFileCacheBuilderTest {
         val fileCache = SnapshotFileCacheBuilder.from(
             tempDir,
             "testFile",
-            KotlinXCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer())),
+            KotlinCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer())),
         ).build()
+
         val entry = CacheEntry("1", 1, 0L, 0L)
         fileCache.save(entry)
+
         val readEntry = fileCache.read()
         assertThat(readEntry!!).isEqualTo(entry)
 
