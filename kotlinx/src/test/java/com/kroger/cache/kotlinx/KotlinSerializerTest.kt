@@ -41,7 +41,7 @@ class KotlinSerializerTest {
 
     @Test
     fun `Given a KotlinCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
-        val serializer = KotlinCacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
+        val serializer = CacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
 
         val result = serializer.toByteArray(null)
 

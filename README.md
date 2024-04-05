@@ -43,7 +43,7 @@ Each serialization implementation comes with a default file persistence implemen
 val fileCache = SnapshotFileCacheBuilder.from(
     context, // application context used to reference application cache directory on Android
     filename = "cacheFile.json", // cache file created in application's cache directory
-    KotlinCacheSerializer(serializer = KotlinCacheEntrySerializer(String.serializer(), Int.serializer())), // implementation of CacheSerializer
+    KotlinCacheSerializer(serializer = CacheEntrySerializer(String.serializer(), Int.serializer())), // implementation of CacheSerializer
 ).build()
 ```
 

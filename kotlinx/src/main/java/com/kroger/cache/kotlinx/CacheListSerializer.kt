@@ -34,7 +34,7 @@ import javax.inject.Inject
 /**
  * [CacheSerializer] instance to map a list of [CacheEntry] values via kotlinx serialization
  */
-public class KotlinCacheEntryListSerializer<K, V> @Inject constructor(
+public class CacheEntryListSerializer<K, V> @Inject constructor(
     private val formatter: StringFormat = Json,
     keySerializer: KSerializer<K>,
     valueSerializer: KSerializer<V>,
