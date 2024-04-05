@@ -25,9 +25,24 @@ package com.kroger.cache
 
 /**
  * Abstraction for serialization
- * Implementing classes should be created their own modules so that consumers may compose their preferred implementations
+ * Implementing classes should be created in their own modules so that consumers may compose their preferred implementations
  */
 public interface CacheSerializer<T> {
+    /**
+     * [decodeFromString] attempts to convert a [ByteArray] into type [T]
+     * Any required dependencies should be provided via the constructor of the implementing class
+     *
+     * @param bytes an optional [ByteArray], usually from a file read
+     * @return [T] The implemented generic type
+     */
     public fun decodeFromString(bytes: ByteArray?): T?
+
+    /**
+     * [toByteArray] converts data of type [T] to a [ByteArray]
+     * Any required dependencies should be provided via the constructor of the implementing class
+     *
+     * @param data the generic data [T] to be converted to a [ByteArray]
+     * @return [ByteArray] to be written to disk
+     */
     public fun toByteArray(data: T?): ByteArray
 }

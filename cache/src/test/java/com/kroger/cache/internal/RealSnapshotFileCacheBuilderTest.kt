@@ -25,6 +25,7 @@ package com.kroger.cache.internal
 
 import com.google.common.truth.Truth.assertThat
 import com.kroger.cache.SnapshotFileCacheBuilder
+import com.kroger.cache.fake.FakeCacheSerializer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
@@ -39,28 +40,18 @@ internal class RealSnapshotFileCacheBuilderTest {
     @Test
     fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
         val filename = "testFile"
-        var readCalled = false
-        val readFunc: (ByteArray) -> String? = {
-            readCalled = true
-            ""
-        }
-        var writeCalled = false
-        val writeFunc: (String?) -> ByteArray = {
-            writeCalled = true
-            ByteArray(0)
-        }
+        val cacheSerializer = FakeCacheSerializer()
 
         val fileCache = SnapshotFileCacheBuilder.from(
             tempDir,
             filename,
-            readFunc,
-            writeFunc,
+            cacheSerializer,
         ).build()
 
         fileCache.save("")
-        assertThat(writeCalled).isTrue()
+        assertThat(cacheSerializer.writeCalled).isTrue()
         fileCache.read()
-        assertThat(readCalled).isTrue()
+        assertThat(cacheSerializer.readCalled).isTrue()
         assertThat(tempDir.resolve(filename).exists()).isTrue()
     }
 }

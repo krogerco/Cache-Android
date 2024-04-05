@@ -51,27 +51,6 @@ public interface SnapshotFileCacheBuilder<T> {
 
     public companion object {
         /**
-         * @param parentDirectory the directory to create and save the cache file in. On Android it is
-         * recommended to be somewhere in the cache directory such as Context.getCacheDir.
-         * @param filename this should be in the form of "com.example.module.feature".
-         * It is important for the filename to be unique across all [Cache] instances.
-         * @param readDataFromFile converter to transform a [ByteArray] read from the cache file into [T]
-         * @param writeDataToFile converter to transform [T] into a [ByteArray] that is saved to the cache file
-         */
-        public fun <T> from(
-            parentDirectory: File,
-            filename: String,
-            readDataFromFile: (ByteArray) -> T?,
-            writeDataToFile: (T?) -> ByteArray,
-        ): SnapshotFileCacheBuilder<T> =
-            RealSnapshotFileCacheBuilder(
-                parentDirectory,
-                filename,
-                readDataFromFile,
-                writeDataToFile,
-            )
-
-        /**
          * This is a convenience function to create a [SnapshotFileCacheBuilder] that uses an implementation of [CacheSerializer]
          * to read and write to the cache [File].
          *
@@ -85,28 +64,11 @@ public interface SnapshotFileCacheBuilder<T> {
             parentDirectory: File,
             filename: String,
             valueSerializer: CacheSerializer<T>,
-        ): SnapshotFileCacheBuilder<T> = from(
-            parentDirectory,
-            filename,
-            DefaultFileReader(valueSerializer),
-            DefaultFileWriter(valueSerializer),
-        )
+        ): SnapshotFileCacheBuilder<T> =
+            RealSnapshotFileCacheBuilder(
+                parentDirectory,
+                filename,
+                valueSerializer,
+            )
     }
-}
-
-private class DefaultFileReader<T>(
-    private val serializer: CacheSerializer<T>,
-) : (ByteArray?) -> T? {
-    override fun invoke(bytes: ByteArray?): T? = serializer.decodeFromString(bytes)
-}
-
-private class DefaultFileWriter<T>(
-    private val serializer: CacheSerializer<T>,
-) : (T?) -> ByteArray {
-    override fun invoke(data: T?): ByteArray =
-        if (data == null) {
-            ByteArray(0)
-        } else {
-            serializer.toByteArray(data)
-        }
 }

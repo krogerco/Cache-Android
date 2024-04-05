@@ -29,16 +29,17 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
 /**
- * [KSerializer] instance to map a list of [CacheEntry] values via kotlinx serialization
+ * [CacheSerializer] instance to map a list of [CacheEntry] values via kotlinx serialization
  */
-public class KotlinCacheListSerializer<K, V>(
+public class KotlinCacheEntryListSerializer<K, V> @Inject constructor(
     private val formatter: StringFormat = Json,
     keySerializer: KSerializer<K>,
     valueSerializer: KSerializer<V>,
 ) : CacheSerializer<List<CacheEntry<K, V>>> {
-    private val listSerializer = ListSerializer(KotlinCacheEntrySerializer(keySerializer, valueSerializer))
+    private val listSerializer = ListSerializer(CacheEntrySerializer(keySerializer, valueSerializer))
 
     override fun decodeFromString(bytes: ByteArray?): List<CacheEntry<K, V>>? =
         if (bytes == null || bytes.isEmpty()) {

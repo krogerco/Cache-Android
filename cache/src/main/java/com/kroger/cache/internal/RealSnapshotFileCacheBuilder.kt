@@ -23,6 +23,7 @@
  */
 package com.kroger.cache.internal
 
+import com.kroger.cache.CacheSerializer
 import com.kroger.cache.SnapshotFileCacheBuilder
 import com.kroger.cache.SnapshotPersistentCache
 import com.kroger.telemetry.Telemeter
@@ -33,8 +34,7 @@ import java.io.File
 internal class RealSnapshotFileCacheBuilder<T>(
     private val parentDirectory: File,
     private val filename: String,
-    private val readDataFromFile: (ByteArray) -> T?,
-    private val writeDataToFile: (T?) -> ByteArray,
+    private val cacheSerializer: CacheSerializer<T>,
 ) : SnapshotFileCacheBuilder<T> {
     private var dispatcher: CoroutineDispatcher = Dispatchers.IO
     private var telemeter: Telemeter? = null
@@ -52,8 +52,7 @@ internal class RealSnapshotFileCacheBuilder<T>(
     override fun build(): SnapshotPersistentCache<T> =
         SnapshotFileCache(
             parentDirectory.resolve(filename),
-            readDataFromFile,
-            writeDataToFile,
+            cacheSerializer,
             telemeter,
             dispatcher,
         )

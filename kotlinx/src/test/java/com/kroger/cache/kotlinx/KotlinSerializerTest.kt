@@ -21,16 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.fake
+package com.kroger.cache.kotlinx
 
-internal object FakeSnapshotFileCacheDataHandler {
-    fun readDataFromFile(bytes: ByteArray): String? =
-        if (bytes.isEmpty()) {
-            null
-        } else {
-            bytes.decodeToString()
-        }
+import com.google.common.truth.Truth.assertThat
+import kotlinx.serialization.builtins.serializer
+import org.junit.jupiter.api.Test
 
-    fun writeDataToFile(string: String?): ByteArray =
-        string.orEmpty().encodeToByteArray()
+class KotlinSerializerTest {
+
+    @Test
+    fun `Given a KotlinCacheSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinCacheSerializer(serializer = CacheEntrySerializer(String.serializer(), Int.serializer()))
+
+        val result = serializer.toByteArray(null)
+
+        assertThat(result).isInstanceOf(ByteArray::class.java)
+        assertThat(result.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Given a KotlinCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinCacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
+
+        val result = serializer.toByteArray(null)
+
+        assertThat(result).isInstanceOf(ByteArray::class.java)
+        assertThat(result.size).isEqualTo(0)
+    }
 }

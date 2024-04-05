@@ -23,6 +23,7 @@
  */
 package com.kroger.cache.internal
 
+import com.kroger.cache.CacheSerializer
 import com.kroger.cache.SnapshotPersistentCache
 import com.kroger.telemetry.Telemeter
 import com.kroger.telemetry.relay.e
@@ -35,8 +36,7 @@ private const val TAG = "SnapshotFileCache"
 
 internal class SnapshotFileCache<T>(
     private val file: File,
-    private val readDataFromFile: (ByteArray) -> T?,
-    private val writeDataToFile: (T?) -> ByteArray,
+    private val cacheSerializer: CacheSerializer<T>,
     private val telemeter: Telemeter? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : SnapshotPersistentCache<T> {
@@ -56,7 +56,7 @@ internal class SnapshotFileCache<T>(
     override suspend fun read(): T? = withContext(dispatcher) {
         runCatching {
             ensureCacheFileCreated()
-            readDataFromFile(file.readBytes())
+            cacheSerializer.decodeFromString(file.readBytes())
         }.onFailure {
             telemeter?.e(TAG, "An error occurred while reading from the cache file: ${file.absolutePath}", it)
         }.getOrNull()
@@ -65,7 +65,7 @@ internal class SnapshotFileCache<T>(
     override suspend fun save(cachedData: T?): Unit = withContext(dispatcher) {
         runCatching {
             ensureCacheFileCreated()
-            val cachedDataBytes = writeDataToFile(cachedData)
+            val cachedDataBytes = cacheSerializer.toByteArray(cachedData)
             file.writeBytes(cachedDataBytes)
         }.onFailure {
             telemeter?.e(TAG, "An error occurred while writing to the cache file: ${file.absolutePath}", it)

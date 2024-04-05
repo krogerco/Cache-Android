@@ -31,6 +31,7 @@ dependencies {
     api(project(":cache"))
     api(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.inject)
 
     testImplementation(libs.jupiter.api)
     testImplementation(libs.kotlinx.coroutines.test)

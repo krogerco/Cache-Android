@@ -27,6 +27,7 @@ import com.kroger.cache.CacheSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
 /**
  * Implementation of [CacheSerializer] for kotlinx Serialization
@@ -34,7 +35,7 @@ import kotlinx.serialization.json.Json
  * @property formatter the [StringFormat] for encoding. Defaults to [Json]
  * @property serializer the [KSerializer] instance for serialization
  */
-public class KotlinCacheSerializer<T> public constructor(
+public class KotlinCacheSerializer<T> @Inject constructor(
     private val formatter: StringFormat = Json,
     private val serializer: KSerializer<T>,
 ) : CacheSerializer<T> {

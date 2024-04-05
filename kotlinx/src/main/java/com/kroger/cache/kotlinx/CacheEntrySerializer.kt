@@ -25,10 +25,9 @@ package com.kroger.cache.kotlinx
 
 import com.kroger.cache.internal.CacheEntry
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -38,12 +37,12 @@ import kotlinx.serialization.encoding.encodeStructure
 /**
  * [KSerializer] instance to map [CacheEntry] via kotlinx serialization
  */
-public class KotlinCacheEntrySerializer<K, V>(private val keySerializer: KSerializer<K>, private val valueSerializer: KSerializer<V>) : KSerializer<CacheEntry<K, V>> {
+public class CacheEntrySerializer<K, V>(private val keySerializer: KSerializer<K>, private val valueSerializer: KSerializer<V>) : KSerializer<CacheEntry<K, V>> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CacheEntry") {
         element("key", keySerializer.descriptor)
         element("value", valueSerializer.descriptor)
-        element("creationDate", PrimitiveSerialDescriptor("creationDate", PrimitiveKind.LONG))
-        element("lastAccessDate", PrimitiveSerialDescriptor("lastAccessDate", PrimitiveKind.LONG))
+        element<Long>("creationDate")
+        element<Long>("lastAccessDate")
     }
 
     override fun serialize(encoder: Encoder, value: CacheEntry<K, V>) {
@@ -66,7 +65,7 @@ public class KotlinCacheEntrySerializer<K, V>(private val keySerializer: KSerial
                     0 -> key = decodeSerializableElement(descriptor, 0, keySerializer)
                     1 -> value = decodeSerializableElement(descriptor, 1, valueSerializer)
                     2 -> creationDate = decodeLongElement(descriptor, 2)
-                    3 -> lastAccessDate = decodeLongElement(descriptor, 2)
+                    3 -> lastAccessDate = decodeLongElement(descriptor, 3)
                     CompositeDecoder.DECODE_DONE -> break
                     else -> error("Unexpected index: $index")
                 }

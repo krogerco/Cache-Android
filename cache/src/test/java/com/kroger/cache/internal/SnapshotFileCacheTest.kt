@@ -24,7 +24,7 @@
 package com.kroger.cache.internal
 
 import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.fake.FakeSnapshotFileCacheDataHandler
+import com.kroger.cache.fake.FakeCacheSerializer
 import com.kroger.cache.fake.FakeTelemeter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -40,6 +40,7 @@ internal class SnapshotFileCacheTest {
     private lateinit var tempDir: File
 
     private val fakeTelemeter = FakeTelemeter()
+    private val cacheSerializer = FakeCacheSerializer()
 
     @Test
     fun `given snapshot file cache when data is saved successfully then data can be read successfully`() = runTest {
@@ -93,8 +94,7 @@ internal class SnapshotFileCacheTest {
         file: File = tempDir.resolve("testFile"),
     ) = SnapshotFileCache(
         file,
-        FakeSnapshotFileCacheDataHandler::readDataFromFile,
-        FakeSnapshotFileCacheDataHandler::writeDataToFile,
+        cacheSerializer,
         fakeTelemeter,
         UnconfinedTestDispatcher(testScheduler),
     )
