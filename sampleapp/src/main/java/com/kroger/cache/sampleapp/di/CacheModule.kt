@@ -25,8 +25,8 @@ package com.kroger.cache.sampleapp.di
 
 import android.content.Context
 import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.android.extensions.from
 import com.kroger.cache.SnapshotPersistentCache
+import com.kroger.cache.android.extensions.from
 import com.kroger.cache.internal.CacheEntry
 import com.kroger.cache.kotlinx.CacheEntryListSerializer
 import com.kroger.cache.kotlinx.KotlinCacheSerializer
