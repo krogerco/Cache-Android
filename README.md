@@ -80,7 +80,7 @@ Listed below are the key components of the cache library.
 ### Snapshot Persistent Cache
 The library provides an implementation of `SnapshotPersistentCache` that saves to a file. This can be used independently from the `MemoryCacheManager` if needed. Writing and reading to the file is not thread safe so if multiple threads use the same `SnapshotPersistentCache` make sure the access is synchronized. On Android the file is saved to the application's cache directory when using the Android builder factory function `SnapshotFileCacheBuilder.from(...)`.
 
-Each serialization implementation provides tooling to save data to a file, via the `CacheSerializer` interface
+Each serialization implementation provides tooling to read and write data to file, via the `CacheSerializer` interface
 
 #### kotlinx serialization
 Saves data to the file using a `StringFormat` from `kotlinx.serialization` defaulting to `Json`. A builder factory function overload is provided so a custom serialization strategy can be used. All that is required is 
