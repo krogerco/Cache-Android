@@ -35,7 +35,6 @@ class MoshiCacheSerializerTest {
         val moshi = Moshi.Builder().build()
         val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
 
-
         val serializer = MoshiCacheSerializer(entrySerializer)
 
         val result = serializer.toByteArray(null)
@@ -44,12 +43,10 @@ class MoshiCacheSerializerTest {
         assertThat(result.size).isEqualTo(0)
     }
 
-
     @Test
     fun `Given a MoshiCacheSerializer, When toByteArray is called with en empty byte array, Then an empty Byte array should be returned`() {
         val moshi = Moshi.Builder().build()
         val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
-
 
         val serializer = MoshiCacheSerializer(entrySerializer)
 

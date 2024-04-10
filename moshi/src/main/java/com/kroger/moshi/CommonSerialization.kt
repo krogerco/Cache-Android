@@ -26,14 +26,14 @@ package com.kroger.moshi
 import com.kroger.cache.internal.CacheEntry
 import com.squareup.moshi.JsonAdapter
 
-public fun <K, V> flattenCacheEntry(cacheEntry: CacheEntry<K, V>?, keyAdapter: JsonAdapter<K>, valueAdapter: JsonAdapter<V>): String = listOf(
+internal fun <K, V> flattenCacheEntry(cacheEntry: CacheEntry<K, V>?, keyAdapter: JsonAdapter<K>, valueAdapter: JsonAdapter<V>): String = listOf(
     keyAdapter.toJson(cacheEntry?.key),
     valueAdapter.toJson(cacheEntry?.value),
     cacheEntry?.creationDate.toString(),
     cacheEntry?.lastAccessDate.toString(),
 ).joinToString(",")
 
-public fun <K, V> hydrateCacheEntry(rawJson: String, keyAdapter: JsonAdapter<K>, valueAdapter: JsonAdapter<V>): CacheEntry<K, V> {
+internal fun <K, V> hydrateCacheEntry(rawJson: String, keyAdapter: JsonAdapter<K>, valueAdapter: JsonAdapter<V>): CacheEntry<K, V> {
     val items = rawJson.split(",")
     require(items.size == 4)
 
