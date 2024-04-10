@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines)
 
+    testImplementation(project(":kotlinx"))
     testImplementation(libs.jupiter.api)
     testImplementation(libs.mockk)
     testImplementation(libs.truth)

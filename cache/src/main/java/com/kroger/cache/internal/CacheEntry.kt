@@ -23,8 +23,6 @@
  */
 package com.kroger.cache.internal
 
-import kotlinx.serialization.Serializable
-
 /**
  * Wrapper class for a cached entry that holds the key/value pair as well as metadata.
  * @property key the key for this entry
@@ -32,7 +30,6 @@ import kotlinx.serialization.Serializable
  * @property creationDate when this entry was created in milliseconds since epoch
  * @property lastAccessDate when this entry was last accessed in milliseconds since epoch
  */
-@Serializable
 public data class CacheEntry<K, V>(
     val key: K,
     val value: V,

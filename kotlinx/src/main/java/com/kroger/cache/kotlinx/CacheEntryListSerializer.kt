@@ -21,39 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
 
 import com.kroger.cache.CacheSerializer
-import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.SnapshotPersistentCache
-import com.kroger.telemetry.Telemeter
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import java.io.File
+import com.kroger.cache.internal.CacheEntry
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-internal class RealSnapshotFileCacheBuilder<T>(
-    private val parentDirectory: File,
-    private val filename: String,
-    private val cacheSerializer: CacheSerializer<T>,
-) : SnapshotFileCacheBuilder<T> {
-    private var dispatcher: CoroutineDispatcher = Dispatchers.IO
-    private var telemeter: Telemeter? = null
+/**
+ * [CacheSerializer] instance to map a list of [CacheEntry] values via kotlinx serialization
+ */
+public class CacheEntryListSerializer<K, V> @Inject constructor(
+    private val formatter: StringFormat = Json,
+    keySerializer: KSerializer<K>,
+    valueSerializer: KSerializer<V>,
+) : CacheSerializer<List<CacheEntry<K, V>>> {
+    private val listSerializer = ListSerializer(CacheEntrySerializer(keySerializer, valueSerializer))
 
-    override fun dispatcher(dispatcher: CoroutineDispatcher): RealSnapshotFileCacheBuilder<T> =
-        apply {
-            this.dispatcher = dispatcher
+    override fun decodeFromString(bytes: ByteArray?): List<CacheEntry<K, V>>? =
+        if (bytes == null || bytes.isEmpty()) {
+            null
+        } else {
+            formatter.decodeFromString(listSerializer, bytes.decodeToString())
         }
 
-    override fun telemeter(telemeter: Telemeter): RealSnapshotFileCacheBuilder<T> =
-        apply {
-            this.telemeter = telemeter
-        }
-
-    override fun build(): SnapshotPersistentCache<T> =
-        SnapshotFileCache(
-            parentDirectory.resolve(filename),
-            cacheSerializer,
-            telemeter,
-            dispatcher,
-        )
+    override fun toByteArray(data: List<CacheEntry<K, V>>?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        formatter.encodeToString(listSerializer, data).encodeToByteArray()
+    }
 }

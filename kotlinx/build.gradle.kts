@@ -21,37 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+plugins {
+    `java-library-module`
+    `release-module`
+    kotlin("plugin.serialization")
+}
 
-import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeCacheSerializer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+dependencies {
+    api(project(":cache"))
+    api(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.inject)
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal class RealSnapshotFileCacheBuilderTest {
-    @field:TempDir
-    private lateinit var tempDir: File
-
-    @Test
-    fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
-        val filename = "testFile"
-        val cacheSerializer = FakeCacheSerializer()
-
-        val fileCache = SnapshotFileCacheBuilder.from(
-            tempDir,
-            filename,
-            cacheSerializer,
-        ).build()
-
-        fileCache.save("")
-        assertThat(cacheSerializer.writeCalled).isTrue()
-        fileCache.read()
-        assertThat(cacheSerializer.readCalled).isTrue()
-        assertThat(tempDir.resolve(filename).exists()).isTrue()
-    }
+    testImplementation(libs.jupiter.api)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
+    testRuntimeOnly(libs.jupiter.engine)
 }

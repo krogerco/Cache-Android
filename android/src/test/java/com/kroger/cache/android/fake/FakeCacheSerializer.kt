@@ -21,16 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.fake
+package com.kroger.cache.android.fake
 
-internal object FakeSnapshotFileCacheDataHandler {
-    fun readDataFromFile(bytes: ByteArray): String? =
-        if (bytes.isEmpty()) {
+import com.kroger.cache.CacheSerializer
+
+internal class FakeCacheSerializer : CacheSerializer<String> {
+    var readCalled = false
+    var writeCalled = false
+
+    override fun decodeFromString(bytes: ByteArray?): String? {
+        readCalled = true
+        return if (bytes == null || bytes.isEmpty()) {
             null
         } else {
             bytes.decodeToString()
         }
+    }
 
-    fun writeDataToFile(string: String?): ByteArray =
-        string.orEmpty().encodeToByteArray()
+    override fun toByteArray(data: String?): ByteArray {
+        writeCalled = true
+        return data.orEmpty().encodeToByteArray()
+    }
 }

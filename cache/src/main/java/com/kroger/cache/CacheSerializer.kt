@@ -21,37 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache
 
-import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeCacheSerializer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+/**
+ * Abstraction for serialization
+ * Implementing classes should be created in their own modules so that consumers may compose their preferred implementations
+ */
+public interface CacheSerializer<T> {
+    /**
+     * [decodeFromString] attempts to convert a [ByteArray] into type [T]
+     * Any required dependencies should be provided via the constructor of the implementing class
+     *
+     * @param bytes an optional [ByteArray], usually from a file read
+     * @return [T] The implemented generic type
+     */
+    public fun decodeFromString(bytes: ByteArray?): T?
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal class RealSnapshotFileCacheBuilderTest {
-    @field:TempDir
-    private lateinit var tempDir: File
-
-    @Test
-    fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
-        val filename = "testFile"
-        val cacheSerializer = FakeCacheSerializer()
-
-        val fileCache = SnapshotFileCacheBuilder.from(
-            tempDir,
-            filename,
-            cacheSerializer,
-        ).build()
-
-        fileCache.save("")
-        assertThat(cacheSerializer.writeCalled).isTrue()
-        fileCache.read()
-        assertThat(cacheSerializer.readCalled).isTrue()
-        assertThat(tempDir.resolve(filename).exists()).isTrue()
-    }
+    /**
+     * [toByteArray] converts data of type [T] to a [ByteArray]
+     * Any required dependencies should be provided via the constructor of the implementing class
+     *
+     * @param data the generic data [T] to be converted to a [ByteArray]
+     * @return [ByteArray] to be written to disk
+     */
+    public fun toByteArray(data: T?): ByteArray
 }

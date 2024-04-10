@@ -21,37 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.fake
 
-import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeCacheSerializer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import com.kroger.cache.CacheSerializer
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal class RealSnapshotFileCacheBuilderTest {
-    @field:TempDir
-    private lateinit var tempDir: File
+class FakeCacheSerializer : CacheSerializer<String> {
+    var readCalled = false
+    var writeCalled = false
 
-    @Test
-    fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
-        val filename = "testFile"
-        val cacheSerializer = FakeCacheSerializer()
+    override fun decodeFromString(bytes: ByteArray?): String? {
+        readCalled = true
+        return if (bytes == null || bytes.isEmpty()) {
+            null
+        } else {
+            bytes.decodeToString()
+        }
+    }
 
-        val fileCache = SnapshotFileCacheBuilder.from(
-            tempDir,
-            filename,
-            cacheSerializer,
-        ).build()
-
-        fileCache.save("")
-        assertThat(cacheSerializer.writeCalled).isTrue()
-        fileCache.read()
-        assertThat(cacheSerializer.readCalled).isTrue()
-        assertThat(tempDir.resolve(filename).exists()).isTrue()
+    override fun toByteArray(data: String?): ByteArray {
+        writeCalled = true
+        return data.orEmpty().encodeToByteArray()
     }
 }

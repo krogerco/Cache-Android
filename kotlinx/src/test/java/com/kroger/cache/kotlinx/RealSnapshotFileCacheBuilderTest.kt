@@ -21,13 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
 
 import com.google.common.truth.Truth.assertThat
 import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeCacheSerializer
+import com.kroger.cache.internal.CacheEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.builtins.serializer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -38,20 +39,41 @@ internal class RealSnapshotFileCacheBuilderTest {
     private lateinit var tempDir: File
 
     @Test
-    fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
-        val filename = "testFile"
-        val cacheSerializer = FakeCacheSerializer()
-
+    fun `given snapshot file cache from builder when values written to cache then expected values read from cache for list`() = runTest {
         val fileCache = SnapshotFileCacheBuilder.from(
             tempDir,
-            filename,
-            cacheSerializer,
+            "testFile",
+            CacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer()),
         ).build()
 
-        fileCache.save("")
-        assertThat(cacheSerializer.writeCalled).isTrue()
-        fileCache.read()
-        assertThat(cacheSerializer.readCalled).isTrue()
-        assertThat(tempDir.resolve(filename).exists()).isTrue()
+        val entry1 = CacheEntry("1", 1, 1000L, 1000L)
+        val entry2 = CacheEntry("2", 2, 1000L, 1000L)
+
+        val entries = listOf(entry1, entry2)
+        fileCache.save(entries)
+
+        val readEntries = fileCache.read()
+        assertThat(readEntries).containsExactlyElementsIn(entries).inOrder()
+
+        fileCache.save(null)
+        assertThat(fileCache.read()).isNull()
+    }
+
+    @Test
+    fun `given snapshot file cache from builder when values written to cache then expected values read from cache for single item`() = runTest {
+        val fileCache = SnapshotFileCacheBuilder.from(
+            tempDir,
+            "testFile",
+            KotlinCacheSerializer(serializer = CacheEntrySerializer(String.serializer(), Int.serializer())),
+        ).build()
+
+        val entry = CacheEntry("1", 1, 1000L, 2000L)
+        fileCache.save(entry)
+
+        val readEntry = fileCache.read()
+        assertThat(readEntry!!).isEqualTo(entry)
+
+        fileCache.save(null)
+        assertThat(fileCache.read()).isNull()
     }
 }

@@ -85,6 +85,7 @@ dependencies {
     }
 
     implementation(project(":android"))
+    implementation(project(":kotlinx"))
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material)

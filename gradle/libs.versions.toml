@@ -42,6 +42,7 @@ androidx-test-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", 
 googleMaterial = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+inject = { module = "javax.inject:javax.inject", version = "1" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 junitVintageEngine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit5" }
 jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }

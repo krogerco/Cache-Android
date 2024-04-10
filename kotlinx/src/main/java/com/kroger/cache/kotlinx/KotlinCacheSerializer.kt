@@ -21,37 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
 
-import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeCacheSerializer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import com.kroger.cache.CacheSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal class RealSnapshotFileCacheBuilderTest {
-    @field:TempDir
-    private lateinit var tempDir: File
+/**
+ * Implementation of [CacheSerializer] for kotlinx Serialization
+ *
+ * @property formatter the [StringFormat] for encoding. Defaults to [Json]
+ * @property serializer the [KSerializer] instance for serialization
+ */
+public class KotlinCacheSerializer<T> @Inject constructor(
+    private val formatter: StringFormat = Json,
+    private val serializer: KSerializer<T>,
+) : CacheSerializer<T> {
+    override fun decodeFromString(bytes: ByteArray?): T? =
+        if (bytes == null || bytes.isEmpty()) {
+            null
+        } else {
+            formatter.decodeFromString(serializer, bytes.decodeToString())
+        }
 
-    @Test
-    fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
-        val filename = "testFile"
-        val cacheSerializer = FakeCacheSerializer()
-
-        val fileCache = SnapshotFileCacheBuilder.from(
-            tempDir,
-            filename,
-            cacheSerializer,
-        ).build()
-
-        fileCache.save("")
-        assertThat(cacheSerializer.writeCalled).isTrue()
-        fileCache.read()
-        assertThat(cacheSerializer.readCalled).isTrue()
-        assertThat(tempDir.resolve(filename).exists()).isTrue()
+    override fun toByteArray(data: T?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        formatter.encodeToString(serializer, data).encodeToByteArray()
     }
 }

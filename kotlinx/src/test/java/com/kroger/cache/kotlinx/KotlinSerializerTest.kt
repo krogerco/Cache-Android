@@ -21,37 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.internal
+package com.kroger.cache.kotlinx
 
 import com.google.common.truth.Truth.assertThat
-import com.kroger.cache.SnapshotFileCacheBuilder
-import com.kroger.cache.fake.FakeCacheSerializer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.builtins.serializer
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal class RealSnapshotFileCacheBuilderTest {
-    @field:TempDir
-    private lateinit var tempDir: File
+class KotlinSerializerTest {
 
     @Test
-    fun `given file cache builder when build called successfully then file cache configured with correct values`() = runTest {
-        val filename = "testFile"
-        val cacheSerializer = FakeCacheSerializer()
+    fun `Given a KotlinCacheSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = KotlinCacheSerializer(serializer = CacheEntrySerializer(String.serializer(), Int.serializer()))
 
-        val fileCache = SnapshotFileCacheBuilder.from(
-            tempDir,
-            filename,
-            cacheSerializer,
-        ).build()
+        val result = serializer.toByteArray(null)
 
-        fileCache.save("")
-        assertThat(cacheSerializer.writeCalled).isTrue()
-        fileCache.read()
-        assertThat(cacheSerializer.readCalled).isTrue()
-        assertThat(tempDir.resolve(filename).exists()).isTrue()
+        assertThat(result).isInstanceOf(ByteArray::class.java)
+        assertThat(result.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Given a KotlinCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
+        val serializer = CacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = Int.serializer())
+
+        val result = serializer.toByteArray(null)
+
+        assertThat(result).isInstanceOf(ByteArray::class.java)
+        assertThat(result.size).isEqualTo(0)
     }
 }
