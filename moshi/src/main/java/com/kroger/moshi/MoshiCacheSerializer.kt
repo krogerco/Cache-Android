@@ -21,24 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-rootProject.name = "cache"
-include(":cache")
-include(":android")
-include(":kotlinx")
-include(":moshi")
-include(":sampleapp")
+package com.kroger.moshi
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
+import com.kroger.cache.CacheSerializer
+import com.squareup.moshi.JsonAdapter
+import javax.inject.Inject
+
+public class MoshiCacheSerializer<T> @Inject constructor(private val adapter: JsonAdapter<T>) : CacheSerializer<T> {
+    override fun decodeFromString(bytes: ByteArray?): T? = if (bytes == null || bytes.isEmpty()) {
+        null
+    } else {
+        adapter.fromJson(bytes.decodeToString())
     }
-}
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
+    override fun toByteArray(data: T?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        adapter.toJson(data).encodeToByteArray()
     }
 }

@@ -21,24 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-rootProject.name = "cache"
-include(":cache")
-include(":android")
-include(":kotlinx")
-include(":moshi")
-include(":sampleapp")
+package com.kroger.moshi
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
+import com.kroger.cache.internal.CacheEntry
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
+import javax.inject.Inject
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
+public class CacheEntrySerializer<K, V> @Inject constructor(internal val keyAdapter: JsonAdapter<K>, internal val valueAdapter: JsonAdapter<V>) : JsonAdapter<CacheEntry<K, V>>() {
+    override fun fromJson(p0: JsonReader): CacheEntry<K, V> =
+        hydrateCacheEntry(p0.nextString(), keyAdapter, valueAdapter)
+
+    override fun toJson(p0: JsonWriter, p1: CacheEntry<K, V>?) {
+        val value = flattenCacheEntry(p1, keyAdapter, valueAdapter)
+        p0.value(value)
     }
 }

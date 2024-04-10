@@ -21,24 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-rootProject.name = "cache"
-include(":cache")
-include(":android")
-include(":kotlinx")
-include(":moshi")
-include(":sampleapp")
-
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
+plugins {
+    `java-library-module`
+    `release-module`
 }
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
+dependencies {
+    api(project(":cache"))
+    api(libs.moshi.kotlin)
+
+    implementation(libs.inject)
+
+    testImplementation(libs.jupiter.api)
+    testImplementation(libs.truth)
+    testRuntimeOnly(libs.jupiter.engine)
 }

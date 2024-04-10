@@ -21,24 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-rootProject.name = "cache"
-include(":cache")
-include(":android")
-include(":kotlinx")
-include(":moshi")
-include(":sampleapp")
+package com.kroger.moshi
 
-pluginManagement {
-    repositories {
-        google()
-        gradlePluginPortal()
-    }
-}
+import com.kroger.cache.internal.CacheEntry
+import com.squareup.moshi.JsonAdapter
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
+public fun <K, V> flattenCacheEntry(cacheEntry: CacheEntry<K, V>?, keyAdapter: JsonAdapter<K>, valueAdapter: JsonAdapter<V>): String = listOf(
+    keyAdapter.toJson(cacheEntry?.key),
+    valueAdapter.toJson(cacheEntry?.value),
+    cacheEntry?.creationDate.toString(),
+    cacheEntry?.lastAccessDate.toString(),
+).joinToString(",")
+
+public fun <K, V> hydrateCacheEntry(rawJson: String, keyAdapter: JsonAdapter<K>, valueAdapter: JsonAdapter<V>): CacheEntry<K, V> {
+    val items = rawJson.split(",")
+    require(items.size == 4)
+
+    val key = keyAdapter.fromJson(items[0])
+    val value = valueAdapter.fromJsonValue(items[1])
+    val creationDate = items[2].toLong()
+    val lastAccessDate = items[3].toLong()
+
+    require(key != null && value != null && creationDate != 0L && lastAccessDate != 0L)
+
+    return CacheEntry(key, value, creationDate, lastAccessDate)
 }
