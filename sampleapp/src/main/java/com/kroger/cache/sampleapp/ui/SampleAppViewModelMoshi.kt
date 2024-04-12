@@ -39,6 +39,7 @@ import com.kroger.cache.internal.CacheEntry
 import com.kroger.cache.sampleapp.CacheConfig
 import com.kroger.cache.sampleapp.FlowPersistentCache
 import com.kroger.cache.sampleapp.TemporalPolicy
+import com.kroger.cache.sampleapp.di.MoshiCache
 import com.kroger.cache.sampleapp.from
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -60,11 +61,11 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
-class SampleAppViewModel @Inject constructor(
-    private val configFileCache: SnapshotPersistentCache<CacheConfig>,
+class SampleAppViewModelMoshi @Inject constructor(
+    @MoshiCache private val configFileCache: SnapshotPersistentCache<CacheConfig>,
+    @MoshiCache private val flowPersistentCache: FlowPersistentCache<List<CacheEntry<String, String>>>,
     private val application: Application,
-    private val flowPersistentCache: FlowPersistentCache<List<CacheEntry<String, String>>>,
-) : ViewModel() {
+) : ViewModel(), ViewModelContract {
     private lateinit var cache: Cache<String, String>
     private var cacheCoroutineScope: CoroutineScope? = null
     private val cacheConfigFlow: MutableStateFlow<CacheConfig?> = MutableStateFlow(null)
@@ -72,7 +73,7 @@ class SampleAppViewModel @Inject constructor(
         .map(CachePolicy.Companion::from)
         .onEach(::createNewCache)
 
-    val uiState: StateFlow<SampleAppUiState> = flowPersistentCache.data
+    override val uiState: StateFlow<SampleAppUiState> = flowPersistentCache.data
         .combine(cachePolicyFlow) { cacheEntries, cachePolicy ->
             val sortedEntries = cacheEntries.orEmpty().sortedBy {
                 if (cachePolicy.hasTtiPolicy) {
@@ -89,22 +90,22 @@ class SampleAppViewModel @Inject constructor(
             SampleAppUiState(emptyList(), CachePolicy.builder().build()),
         )
 
-    var maxSize: String by mutableStateOf("")
+    override var maxSize: String by mutableStateOf("")
         private set
 
-    val isMaxSizeValid by derivedStateOf {
+    override val isMaxSizeValid by derivedStateOf {
         (maxSize.toIntOrNull() ?: -1) > 0
     }
 
-    var temporalTime: String by mutableStateOf("")
+    override var temporalTime: String by mutableStateOf("")
         private set
 
-    val isTemporalTimeValid by derivedStateOf {
+    override val isTemporalTimeValid by derivedStateOf {
         temporalPolicy == TemporalPolicy.NONE ||
-            (temporalTime.toIntOrNull() ?: -1) > 0
+                (temporalTime.toIntOrNull() ?: -1) > 0
     }
 
-    var temporalPolicy: TemporalPolicy by mutableStateOf(TemporalPolicy.NONE)
+    override var temporalPolicy: TemporalPolicy by mutableStateOf(TemporalPolicy.NONE)
         private set
 
     init {
@@ -115,19 +116,19 @@ class SampleAppViewModel @Inject constructor(
         }
     }
 
-    fun updateTemporalPolicy(temporalPolicy: TemporalPolicy) {
+    override fun updateTemporalPolicy(temporalPolicy: TemporalPolicy) {
         this.temporalPolicy = temporalPolicy
     }
 
-    fun updateMaxSize(maxSize: String) {
+    override fun updateMaxSize(maxSize: String) {
         this.maxSize = maxSize
     }
 
-    fun updateTemporalTime(temporalTime: String) {
+    override fun updateTemporalTime(temporalTime: String) {
         this.temporalTime = temporalTime
     }
 
-    fun applyCacheOptions() {
+    override fun applyCacheOptions() {
         val temporalTime = temporalTime.toIntOrNull() ?: 0
         val tti = temporalTime.takeIf { temporalPolicy == TemporalPolicy.TTI }
         val ttl = temporalTime.takeIf { temporalPolicy == TemporalPolicy.TTL }
@@ -138,7 +139,7 @@ class SampleAppViewModel @Inject constructor(
         }
     }
 
-    fun addRandomEntries(count: Int) {
+    override fun addRandomEntries(count: Int) {
         viewModelScope.launch {
             repeat(count) {
                 cache.put(UUID.randomUUID().toString(), UUID.randomUUID().toString())
@@ -147,15 +148,15 @@ class SampleAppViewModel @Inject constructor(
         }
     }
 
-    fun deleteEntry(key: String) {
+    override fun deleteEntry(key: String) {
         viewModelScope.launch { cache.remove(key) }
     }
 
-    fun getEntry(key: String) {
+    override fun getEntry(key: String) {
         viewModelScope.launch { cache.get(key) }
     }
 
-    fun updateEntryWithRandomValue(key: String) {
+    override fun updateEntryWithRandomValue(key: String) {
         viewModelScope.launch { cache.put(key, UUID.randomUUID().toString()) }
     }
 
@@ -166,10 +167,12 @@ class SampleAppViewModel @Inject constructor(
                 temporalPolicy = TemporalPolicy.TTI
                 cacheConfig.tti.toString()
             }
+
             cacheConfig.ttl != null -> {
                 temporalPolicy = TemporalPolicy.TTL
                 cacheConfig.ttl.toString()
             }
+
             else -> {
                 temporalPolicy = TemporalPolicy.NONE
                 ""
@@ -196,7 +199,3 @@ class SampleAppViewModel @Inject constructor(
     }
 }
 
-data class SampleAppUiState(
-    val cacheEntries: List<CacheEntry<String, String>>,
-    val cachePolicy: CachePolicy,
-)

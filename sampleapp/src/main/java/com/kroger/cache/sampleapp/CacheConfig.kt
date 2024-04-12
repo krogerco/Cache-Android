@@ -23,9 +23,11 @@
  */
 package com.kroger.cache.sampleapp
 
+import com.squareup.moshi.JsonClass
 import kotlinx.serialization.Serializable
 
 @Serializable
+@JsonClass(generateAdapter = true)
 data class CacheConfig(
     val ttl: Int? = null,
     val tti: Int? = null,

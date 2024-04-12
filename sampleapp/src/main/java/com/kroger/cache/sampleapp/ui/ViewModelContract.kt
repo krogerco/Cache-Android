@@ -21,13 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-    id("org.jetbrains.dokka")
-    id("com.google.devtools.ksp") version "1.7.20-1.0.8" apply false
-}
+package com.kroger.cache.sampleapp.ui
 
-tasks {
-    register("clean", Delete::class) {
-        delete(rootProject.buildDir)
-    }
+import com.kroger.cache.sampleapp.TemporalPolicy
+import kotlinx.coroutines.flow.StateFlow
+
+interface ViewModelContract {
+    val uiState: StateFlow<SampleAppUiState>
+    val temporalPolicy: TemporalPolicy
+    val maxSize: String
+    val isMaxSizeValid: Boolean
+    val temporalTime: String
+    val isTemporalTimeValid: Boolean
+
+    fun updateMaxSize(maxSize: String)
+    fun updateTemporalTime(temporalTime: String)
+    fun updateTemporalPolicy(temporalPolicy: TemporalPolicy)
+    fun applyCacheOptions()
+    fun deleteEntry(key: String)
+    fun getEntry(key: String)
+    fun updateEntryWithRandomValue(key: String)
+    fun addRandomEntries(count: Int)
 }

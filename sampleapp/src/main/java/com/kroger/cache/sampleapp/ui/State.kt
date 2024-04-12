@@ -21,13 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-plugins {
-    id("org.jetbrains.dokka")
-    id("com.google.devtools.ksp") version "1.7.20-1.0.8" apply false
-}
+package com.kroger.cache.sampleapp.ui
 
-tasks {
-    register("clean", Delete::class) {
-        delete(rootProject.buildDir)
-    }
+import com.kroger.cache.CachePolicy
+import com.kroger.cache.internal.CacheEntry
+
+data class SampleAppUiState(
+    val cacheEntries: List<CacheEntry<String, String>>,
+    val cachePolicy: CachePolicy,
+)
+
+sealed class SampleSerializer(val name: String) {
+    object Moshi : SampleSerializer("Moshi")
+    object Kotlin : SampleSerializer("Kotlin")
 }

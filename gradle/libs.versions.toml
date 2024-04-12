@@ -55,6 +55,7 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+moshi-ksp = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 telemetry = { module = "com.kroger.telemetry:telemetry", version.ref = "telemetry" }
 telemetry-android = { module = "com.kroger.telemetry:android", version.ref = "telemetry" }
