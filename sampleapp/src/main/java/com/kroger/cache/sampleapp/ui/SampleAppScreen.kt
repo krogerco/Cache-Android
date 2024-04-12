@@ -102,7 +102,6 @@ fun SampleAppScreen(
     }
     val uiState: SampleAppUiState by localViewModel.uiState.collectAsStateWithLifecycle()
 
-
     Column {
         TabRow(selectedTabIndex = tabIndex) {
             tabItems.forEachIndexed { index, tabItem ->
