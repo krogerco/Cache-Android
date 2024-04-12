@@ -96,7 +96,7 @@ fun SampleAppScreen(
     var tabIndex: Int by rememberSaveable { mutableStateOf(0) }
     val tabItems = listOf(SampleSerializer.Kotlin, SampleSerializer.Moshi)
     var serializer: SampleSerializer by remember { mutableStateOf(SampleSerializer.Kotlin) }
-    val localViewModel: ViewModelContract = when(serializer) {
+    val localViewModel: ViewModelContract = when (serializer) {
         is SampleSerializer.Kotlin -> kotlinViewModel
         is SampleSerializer.Moshi -> moshiViewModel
     }

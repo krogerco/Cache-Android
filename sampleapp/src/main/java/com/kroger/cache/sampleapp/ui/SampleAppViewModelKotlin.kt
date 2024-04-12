@@ -101,8 +101,7 @@ class SampleAppViewModelKotlin @Inject constructor(
         private set
 
     override val isTemporalTimeValid by derivedStateOf {
-        temporalPolicy == TemporalPolicy.NONE ||
-                (temporalTime.toIntOrNull() ?: -1) > 0
+        temporalPolicy == TemporalPolicy.NONE || (temporalTime.toIntOrNull() ?: -1) > 0
     }
 
     override var temporalPolicy: TemporalPolicy by mutableStateOf(TemporalPolicy.NONE)
@@ -198,4 +197,3 @@ class SampleAppViewModelKotlin @Inject constructor(
         cacheCoroutineScope?.cancel()
     }
 }
-
