@@ -27,14 +27,65 @@ import com.kroger.cache.internal.CacheEntry
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
+import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
-public class CacheEntrySerializer<K, V> @Inject constructor(internal val keyAdapter: JsonAdapter<K>, internal val valueAdapter: JsonAdapter<V>) : JsonAdapter<CacheEntry<K, V>>() {
-    override fun fromJson(p0: JsonReader): CacheEntry<K, V> =
-        hydrateCacheEntry(p0.nextString(), keyAdapter, valueAdapter)
+/**
+ * An implementation of a Moshi [JsonAdapter] for the [CacheEntry] class
+ *
+ * @property moshi an instance of Moshi
+ * @property keyAdapter the [JsonAdapter] for [CacheEntry.key]
+ * @property valueAdapter the [JsonAdapter] for [CacheEntry.value]
+ */
+public class CacheEntrySerializer<K, V> @Inject constructor(
+    private val moshi: Moshi,
+    internal val keyAdapter: JsonAdapter<K>,
+    internal val valueAdapter: JsonAdapter<V>,
+) : JsonAdapter<CacheEntry<K, V>>() {
+    private val options: JsonReader.Options
+        get() = JsonReader.Options.of("key", "value", "creationDate", "lastAccessDate")
 
-    override fun toJson(p0: JsonWriter, p1: CacheEntry<K, V>?) {
-        val value = flattenCacheEntry(p1, keyAdapter, valueAdapter)
-        p0.value(value)
+    private val nullableLongAdapter: JsonAdapter<Long?>
+        get() = moshi.adapter(Long::class.javaObjectType)
+    private val longAdapter: JsonAdapter<Long> = moshi.adapter(Long::class.java)
+
+    override fun fromJson(reader: JsonReader): CacheEntry<K, V> {
+        var key: K? = null
+        var value: V? = null
+        var creationDate: Long? = 0L
+        var lastAccessDate: Long? = 0L
+
+        reader.beginObject()
+        while (reader.hasNext()) {
+            when (reader.selectName(options)) {
+                0 -> key = keyAdapter.fromJson(reader)
+                1 -> value = valueAdapter.fromJson(reader)
+                2 -> creationDate = nullableLongAdapter.fromJson(reader)
+                3 -> lastAccessDate = nullableLongAdapter.fromJson(reader)
+                -1 -> {
+                    reader.skipName()
+                    reader.skipValue()
+                }
+            }
+        }
+        reader.endObject()
+        require(key != null && value != null && creationDate != null && creationDate != 0L && lastAccessDate != null && lastAccessDate != 0L)
+
+        return CacheEntry(key, value, creationDate, lastAccessDate)
+    }
+
+    public override fun toJson(writer: JsonWriter, cacheEntry: CacheEntry<K, V>?) {
+        require(cacheEntry != null)
+
+        writer.beginObject()
+        writer.name("key")
+        keyAdapter.toJson(writer, cacheEntry.key)
+        writer.name("value")
+        valueAdapter.toJson(writer, cacheEntry.value)
+        writer.name("creationDate")
+        longAdapter.toJson(writer, cacheEntry.creationDate)
+        writer.name("lastAccessDate")
+        longAdapter.toJson(writer, cacheEntry.lastAccessDate)
+        writer.endObject()
     }
 }

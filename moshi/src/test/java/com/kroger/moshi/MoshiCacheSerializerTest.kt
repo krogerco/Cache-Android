@@ -33,7 +33,7 @@ class MoshiCacheSerializerTest {
     @Test
     fun `Given a MoshiCacheSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
         val moshi = Moshi.Builder().build()
-        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
+        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi, moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
 
         val serializer = MoshiCacheSerializer(entrySerializer)
 
@@ -44,9 +44,9 @@ class MoshiCacheSerializerTest {
     }
 
     @Test
-    fun `Given a MoshiCacheSerializer, When toByteArray is called with en empty byte array, Then an empty Byte array should be returned`() {
+    fun `Given a MoshiCacheSerializer, When toByteArray is called with an empty byte array, Then an empty Byte array should be returned`() {
         val moshi = Moshi.Builder().build()
-        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
+        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi, moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
 
         val serializer = MoshiCacheSerializer(entrySerializer)
 
@@ -59,7 +59,7 @@ class MoshiCacheSerializerTest {
     fun `Given a MoshiCacheSerializer, When toByteArray is called with valid data, Then a CacheEntry should be returned`() {
         val cacheEntry = CacheEntry("Hello", 8, 12345L, 6789L)
         val moshi = Moshi.Builder().build()
-        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
+        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi, moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
 
         val serializer = MoshiCacheSerializer(entrySerializer)
 
@@ -72,7 +72,7 @@ class MoshiCacheSerializerTest {
     @Test
     fun `Given a KotlinCacheListSerializer, When toByteArray is called with null data, Then an empty Byte array should be returned`() {
         val moshi = Moshi.Builder().build()
-        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
+        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi, moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
         val entryListSerializer: CacheEntryListSerializer<String, Int> = CacheEntryListSerializer(cacheEntrySerializer = entrySerializer)
 
         val serializer = MoshiCacheSerializer(entryListSerializer)
@@ -84,9 +84,9 @@ class MoshiCacheSerializerTest {
     }
 
     @Test
-    fun `Given a KotlinCacheListSerializer, When toByteArray is called with en empty byte array, Then an empty Byte array should be returned`() {
+    fun `Given a KotlinCacheListSerializer, When toByteArray is called with an empty byte array, Then an empty Byte array should be returned`() {
         val moshi = Moshi.Builder().build()
-        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
+        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi, moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
         val entryListSerializer: CacheEntryListSerializer<String, Int> = CacheEntryListSerializer(cacheEntrySerializer = entrySerializer)
 
         val serializer = MoshiCacheSerializer(entryListSerializer)
@@ -101,7 +101,7 @@ class MoshiCacheSerializerTest {
         val cacheEntry1 = CacheEntry("Hello", 8, 12345L, 6789L)
         val cacheEntry2 = CacheEntry("Goodbye", 12, 6789L, 12345L)
         val moshi = Moshi.Builder().build()
-        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
+        val entrySerializer: CacheEntrySerializer<String, Int> = CacheEntrySerializer(moshi, moshi.adapter(String::class.java), moshi.adapter(Int::class.java))
         val entryListSerializer: CacheEntryListSerializer<String, Int> = CacheEntryListSerializer(cacheEntrySerializer = entrySerializer)
 
         val serializer = MoshiCacheSerializer(entryListSerializer)

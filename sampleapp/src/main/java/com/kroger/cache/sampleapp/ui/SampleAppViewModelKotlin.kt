@@ -39,7 +39,7 @@ import com.kroger.cache.internal.CacheEntry
 import com.kroger.cache.sampleapp.CacheConfig
 import com.kroger.cache.sampleapp.FlowPersistentCache
 import com.kroger.cache.sampleapp.TemporalPolicy
-import com.kroger.cache.sampleapp.di.Kotlinx
+import com.kroger.cache.sampleapp.di.KotlinxCache
 import com.kroger.cache.sampleapp.from
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -62,8 +62,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class SampleAppViewModelKotlin @Inject constructor(
-    @Kotlinx private val configFileCache: SnapshotPersistentCache<CacheConfig>,
-    @Kotlinx private val flowPersistentCache: FlowPersistentCache<List<CacheEntry<String, String>>>,
+    @KotlinxCache private val configFileCache: SnapshotPersistentCache<CacheConfig>,
+    @KotlinxCache private val flowPersistentCache: FlowPersistentCache<List<CacheEntry<String, String>>>,
     private val application: Application,
 ) : ViewModel(), ViewModelContract {
     private lateinit var cache: Cache<String, String>

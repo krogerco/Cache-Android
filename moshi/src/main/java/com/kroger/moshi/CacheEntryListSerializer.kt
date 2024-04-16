@@ -29,16 +29,31 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import javax.inject.Inject
 
+/**
+ * An implementation of [JsonAdapter] for handling a list of [CacheEntry] objects
+ *
+ * @property cacheEntrySerializer [CacheEntrySerializer] for serializing individual [CacheEntry] objects
+ */
 public class CacheEntryListSerializer<K, V> @Inject constructor(private val cacheEntrySerializer: CacheEntrySerializer<K, V>) : JsonAdapter<List<CacheEntry<K, V>>>() {
-    override fun fromJson(p0: JsonReader): List<CacheEntry<K, V>> {
-        val items = p0.nextString().split(";")
+    override fun fromJson(reader: JsonReader): List<CacheEntry<K, V>> {
+        val entries = mutableListOf<CacheEntry<K, V>>()
 
-        return items.map { hydrateCacheEntry(it, cacheEntrySerializer.keyAdapter, cacheEntrySerializer.valueAdapter) }
+        reader.beginArray()
+        while (reader.hasNext()) {
+            entries.add(cacheEntrySerializer.fromJson(reader))
+        }
+        reader.endArray()
+
+        return entries.toList()
     }
 
-    override fun toJson(p0: JsonWriter, p1: List<CacheEntry<K, V>>?) {
-        val value = p1?.joinToString(";") { flattenCacheEntry(it, cacheEntrySerializer.keyAdapter, cacheEntrySerializer.valueAdapter) }
+    override fun toJson(writer: JsonWriter, cacheEntries: List<CacheEntry<K, V>>?) {
+        require(!cacheEntries.isNullOrEmpty())
 
-        p0.value(value)
+        writer.beginArray()
+        cacheEntries.forEach { entry ->
+            cacheEntrySerializer.toJson(writer, entry)
+        }
+        writer.endArray()
     }
 }

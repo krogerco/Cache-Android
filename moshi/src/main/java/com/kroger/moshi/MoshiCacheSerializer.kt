@@ -27,6 +27,11 @@ import com.kroger.cache.CacheSerializer
 import com.squareup.moshi.JsonAdapter
 import javax.inject.Inject
 
+/**
+ * Implementation of [CacheSerializer] for [Moshi](https://github.com/square/moshi)
+ *
+ * @property adapter a moshi [JsonAdapter] for the desired type
+ */
 public class MoshiCacheSerializer<T> @Inject constructor(private val adapter: JsonAdapter<T>) : CacheSerializer<T> {
     override fun decodeFromString(bytes: ByteArray?): T? = if (bytes == null || bytes.isEmpty()) {
         null
