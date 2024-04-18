@@ -33,7 +33,7 @@ import javax.inject.Inject
  * @property adapter a moshi [JsonAdapter] for the desired type
  */
 public class MoshiCacheSerializer<T> @Inject constructor(private val adapter: JsonAdapter<T>) : CacheSerializer<T> {
-    override fun decodeFromString(bytes: ByteArray?): T? = if (bytes == null || bytes.isEmpty()) {
+    override fun decodeFromByteArray(bytes: ByteArray?): T? = if (bytes == null || bytes.isEmpty()) {
         null
     } else {
         adapter.fromJson(bytes.decodeToString())

@@ -50,7 +50,7 @@ class MoshiCacheSerializerTest {
 
         val serializer = MoshiCacheSerializer(entrySerializer)
 
-        val result = serializer.decodeFromString(ByteArray(0))
+        val result = serializer.decodeFromByteArray(ByteArray(0))
 
         assertThat(result).isNull()
     }
@@ -66,7 +66,7 @@ class MoshiCacheSerializerTest {
         val result = serializer.toByteArray(cacheEntry)
 
         assertThat(result).isInstanceOf(ByteArray::class.java)
-        assertThat(serializer.decodeFromString(result)).isEqualTo(cacheEntry)
+        assertThat(serializer.decodeFromByteArray(result)).isEqualTo(cacheEntry)
     }
 
     @Test
@@ -91,7 +91,7 @@ class MoshiCacheSerializerTest {
 
         val serializer = MoshiCacheSerializer(entryListSerializer)
 
-        val result = serializer.decodeFromString(ByteArray(0))
+        val result = serializer.decodeFromByteArray(ByteArray(0))
 
         assertThat(result).isNull()
     }
@@ -110,7 +110,7 @@ class MoshiCacheSerializerTest {
 
         assertThat(result).isInstanceOf(ByteArray::class.java)
 
-        val entries = serializer.decodeFromString(result)!!
+        val entries = serializer.decodeFromByteArray(result)!!
 
         assertThat(entries[0]).isEqualTo(cacheEntry1)
         assertThat(entries[1]).isEqualTo(cacheEntry2)

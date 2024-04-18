@@ -29,7 +29,7 @@ class FakeCacheSerializer : CacheSerializer<String> {
     var readCalled = false
     var writeCalled = false
 
-    override fun decodeFromString(bytes: ByteArray?): String? {
+    override fun decodeFromByteArray(bytes: ByteArray?): String? {
         readCalled = true
         return if (bytes == null || bytes.isEmpty()) {
             null

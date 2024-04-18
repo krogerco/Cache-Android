@@ -39,7 +39,7 @@ public class KotlinCacheSerializer<T> @Inject constructor(
     private val formatter: StringFormat = Json,
     private val serializer: KSerializer<T>,
 ) : CacheSerializer<T> {
-    override fun decodeFromString(bytes: ByteArray?): T? =
+    override fun decodeFromByteArray(bytes: ByteArray?): T? =
         if (bytes == null || bytes.isEmpty()) {
             null
         } else {

@@ -41,7 +41,7 @@ public class CacheEntryListSerializer<K, V> @Inject constructor(
 ) : CacheSerializer<List<CacheEntry<K, V>>> {
     private val listSerializer = ListSerializer(CacheEntrySerializer(keySerializer, valueSerializer))
 
-    override fun decodeFromString(bytes: ByteArray?): List<CacheEntry<K, V>>? =
+    override fun decodeFromByteArray(bytes: ByteArray?): List<CacheEntry<K, V>>? =
         if (bytes == null || bytes.isEmpty()) {
             null
         } else {
