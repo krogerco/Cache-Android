@@ -48,6 +48,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
@@ -59,6 +61,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +72,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kroger.cache.CachePolicy
@@ -86,25 +90,49 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SampleAppScreen(
-    viewModel: SampleAppViewModel = viewModel(),
+    kotlinViewModel: SampleAppViewModelKotlin = viewModel(),
+    moshiViewModel: SampleAppViewModelMoshi = viewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    SampleAppScreenContent(
-        uiState = uiState,
-        temporalPolicy = viewModel.temporalPolicy,
-        maxSize = viewModel.maxSize,
-        isMaxSizeValid = viewModel.isMaxSizeValid,
-        temporalTime = viewModel.temporalTime,
-        isTemporalTimeValid = viewModel.isTemporalTimeValid,
-        updateMaxSize = viewModel::updateMaxSize,
-        onUpdateTemporalTime = viewModel::updateTemporalTime,
-        onUpdateTemporalPolicy = viewModel::updateTemporalPolicy,
-        onApplyCacheOptions = viewModel::applyCacheOptions,
-        onDeleteEntry = viewModel::deleteEntry,
-        onGetEntry = viewModel::getEntry,
-        onUpdateEntryWithRandomValue = viewModel::updateEntryWithRandomValue,
-        onAddRandomEntries = viewModel::addRandomEntries,
-    )
+    var tabIndex: Int by rememberSaveable { mutableStateOf(0) }
+    val tabItems = listOf(SampleSerializer.Kotlin, SampleSerializer.Moshi)
+    var serializer: SampleSerializer by remember { mutableStateOf(SampleSerializer.Kotlin) }
+    val localViewModel: ViewModelContract = when (serializer) {
+        is SampleSerializer.Kotlin -> kotlinViewModel
+        is SampleSerializer.Moshi -> moshiViewModel
+    }
+    val uiState: SampleAppUiState by localViewModel.uiState.collectAsStateWithLifecycle()
+
+    Column {
+        TabRow(selectedTabIndex = tabIndex) {
+            tabItems.forEachIndexed { index, tabItem ->
+                Tab(
+                    selected = index == tabIndex,
+                    onClick = {
+                        tabIndex = index
+                        serializer = tabItem
+                    },
+                    text = { Text(text = tabItem.name) },
+                )
+            }
+        }
+
+        SampleAppScreenContent(
+            uiState = uiState,
+            temporalPolicy = localViewModel.temporalPolicy,
+            maxSize = localViewModel.maxSize,
+            isMaxSizeValid = localViewModel.isMaxSizeValid,
+            temporalTime = localViewModel.temporalTime,
+            isTemporalTimeValid = localViewModel.isTemporalTimeValid,
+            updateMaxSize = localViewModel::updateMaxSize,
+            onUpdateTemporalTime = localViewModel::updateTemporalTime,
+            onUpdateTemporalPolicy = localViewModel::updateTemporalPolicy,
+            onApplyCacheOptions = localViewModel::applyCacheOptions,
+            onDeleteEntry = localViewModel::deleteEntry,
+            onGetEntry = localViewModel::getEntry,
+            onUpdateEntryWithRandomValue = localViewModel::updateEntryWithRandomValue,
+            onAddRandomEntries = localViewModel::addRandomEntries,
+        )
+    }
 }
 
 @Composable
@@ -336,6 +364,8 @@ private fun LazyItemScope.CacheEntry(
             TextLabel(stringResource(R.string.temporal_age_label))
             TextValue(temporalAge.inWholeSeconds.toString())
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 

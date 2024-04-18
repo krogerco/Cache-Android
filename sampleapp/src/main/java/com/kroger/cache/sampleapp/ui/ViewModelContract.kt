@@ -21,25 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.fake
+package com.kroger.cache.sampleapp.ui
 
-import com.kroger.cache.CacheSerializer
+import com.kroger.cache.sampleapp.TemporalPolicy
+import kotlinx.coroutines.flow.StateFlow
 
-class FakeCacheSerializer : CacheSerializer<String> {
-    var readCalled = false
-    var writeCalled = false
+interface ViewModelContract {
+    val uiState: StateFlow<SampleAppUiState>
+    val temporalPolicy: TemporalPolicy
+    val maxSize: String
+    val isMaxSizeValid: Boolean
+    val temporalTime: String
+    val isTemporalTimeValid: Boolean
 
-    override fun decodeFromByteArray(bytes: ByteArray?): String? {
-        readCalled = true
-        return if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            bytes.decodeToString()
-        }
-    }
-
-    override fun toByteArray(data: String?): ByteArray {
-        writeCalled = true
-        return data.orEmpty().encodeToByteArray()
-    }
+    fun updateMaxSize(maxSize: String)
+    fun updateTemporalTime(temporalTime: String)
+    fun updateTemporalPolicy(temporalPolicy: TemporalPolicy)
+    fun applyCacheOptions()
+    fun deleteEntry(key: String)
+    fun getEntry(key: String)
+    fun updateEntryWithRandomValue(key: String)
+    fun addRandomEntries(count: Int)
 }

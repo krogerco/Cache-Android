@@ -21,25 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.fake
+package com.kroger.cache.sampleapp.ui
 
-import com.kroger.cache.CacheSerializer
+import com.kroger.cache.CachePolicy
+import com.kroger.cache.internal.CacheEntry
 
-class FakeCacheSerializer : CacheSerializer<String> {
-    var readCalled = false
-    var writeCalled = false
+data class SampleAppUiState(
+    val cacheEntries: List<CacheEntry<String, String>>,
+    val cachePolicy: CachePolicy,
+)
 
-    override fun decodeFromByteArray(bytes: ByteArray?): String? {
-        readCalled = true
-        return if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            bytes.decodeToString()
-        }
-    }
-
-    override fun toByteArray(data: String?): ByteArray {
-        writeCalled = true
-        return data.orEmpty().encodeToByteArray()
-    }
+sealed class SampleSerializer(val name: String) {
+    object Moshi : SampleSerializer("Moshi")
+    object Kotlin : SampleSerializer("Kotlin")
 }

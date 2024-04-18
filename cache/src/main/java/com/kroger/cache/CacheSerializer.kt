@@ -29,13 +29,13 @@ package com.kroger.cache
  */
 public interface CacheSerializer<T> {
     /**
-     * [decodeFromString] attempts to convert a [ByteArray] into type [T]
+     * [decodeFromByteArray] attempts to convert a [ByteArray] into type [T]
      * Any required dependencies should be provided via the constructor of the implementing class
      *
      * @param bytes an optional [ByteArray], usually from a file read
      * @return [T] The implemented generic type
      */
-    public fun decodeFromString(bytes: ByteArray?): T?
+    public fun decodeFromByteArray(bytes: ByteArray?): T?
 
     /**
      * [toByteArray] converts data of type [T] to a [ByteArray]

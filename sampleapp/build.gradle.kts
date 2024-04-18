@@ -27,6 +27,7 @@ plugins {
     kotlin("kapt")
     kotlin("plugin.serialization")
     id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
 }
 
 kapt {
@@ -86,6 +87,7 @@ dependencies {
 
     implementation(project(":android"))
     implementation(project(":kotlinx"))
+    implementation(project(":moshi"))
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material)
@@ -101,4 +103,6 @@ dependencies {
     // Dagger Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    ksp(libs.moshi.ksp)
 }

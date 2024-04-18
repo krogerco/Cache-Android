@@ -21,36 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.kotlinx
+package com.kroger.moshi
 
-import com.kroger.cache.CacheSerializer
 import com.kroger.cache.internal.CacheEntry
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.StringFormat
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import javax.inject.Inject
 
 /**
- * [CacheSerializer] instance to map a list of [CacheEntry] values via kotlinx serialization
+ * An implementation of [JsonAdapter] for handling a list of [CacheEntry] objects
+ *
+ * @property cacheEntrySerializer [CacheEntrySerializer] for serializing individual [CacheEntry] objects
  */
-public class CacheEntryListSerializer<K, V> @Inject constructor(
-    private val formatter: StringFormat = Json,
-    keySerializer: KSerializer<K>,
-    valueSerializer: KSerializer<V>,
-) : CacheSerializer<List<CacheEntry<K, V>>> {
-    private val listSerializer = ListSerializer(CacheEntrySerializer(keySerializer, valueSerializer))
+public class CacheEntryListSerializer<K, V> @Inject constructor(private val cacheEntrySerializer: CacheEntrySerializer<K, V>) : JsonAdapter<List<CacheEntry<K, V>>>() {
+    override fun fromJson(reader: JsonReader): List<CacheEntry<K, V>> {
+        val entries = mutableListOf<CacheEntry<K, V>>()
 
-    override fun decodeFromByteArray(bytes: ByteArray?): List<CacheEntry<K, V>>? =
-        if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            formatter.decodeFromString(listSerializer, bytes.decodeToString())
+        reader.beginArray()
+        while (reader.hasNext()) {
+            entries.add(cacheEntrySerializer.fromJson(reader))
         }
+        reader.endArray()
 
-    override fun toByteArray(data: List<CacheEntry<K, V>>?): ByteArray = if (data == null) {
-        ByteArray(0)
-    } else {
-        formatter.encodeToString(listSerializer, data).encodeToByteArray()
+        return entries.toList()
+    }
+
+    override fun toJson(writer: JsonWriter, cacheEntries: List<CacheEntry<K, V>>?) {
+        cacheEntries?.let {
+            writer.beginArray()
+            cacheEntries.forEach { entry ->
+                cacheEntrySerializer.toJson(writer, entry)
+            }
+            writer.endArray()
+        } ?: writer.nullValue()
     }
 }

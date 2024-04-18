@@ -56,7 +56,7 @@ internal class SnapshotFileCache<T>(
     override suspend fun read(): T? = withContext(dispatcher) {
         runCatching {
             ensureCacheFileCreated()
-            cacheSerializer.decodeFromString(file.readBytes())
+            cacheSerializer.decodeFromByteArray(file.readBytes())
         }.onFailure {
             telemeter?.e(TAG, "An error occurred while reading from the cache file: ${file.absolutePath}", it)
         }.getOrNull()

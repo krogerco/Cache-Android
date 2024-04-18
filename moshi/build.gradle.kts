@@ -21,25 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.fake
+plugins {
+    `java-library-module`
+    `release-module`
+}
 
-import com.kroger.cache.CacheSerializer
+dependencies {
+    api(project(":cache"))
+    api(libs.moshi.kotlin)
 
-class FakeCacheSerializer : CacheSerializer<String> {
-    var readCalled = false
-    var writeCalled = false
+    implementation(libs.inject)
 
-    override fun decodeFromByteArray(bytes: ByteArray?): String? {
-        readCalled = true
-        return if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            bytes.decodeToString()
-        }
-    }
-
-    override fun toByteArray(data: String?): ByteArray {
-        writeCalled = true
-        return data.orEmpty().encodeToByteArray()
-    }
+    testImplementation(libs.jupiter.api)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
+    testRuntimeOnly(libs.jupiter.engine)
 }

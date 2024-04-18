@@ -21,25 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.kroger.cache.fake
+package com.kroger.moshi
 
 import com.kroger.cache.CacheSerializer
+import com.squareup.moshi.JsonAdapter
+import javax.inject.Inject
 
-class FakeCacheSerializer : CacheSerializer<String> {
-    var readCalled = false
-    var writeCalled = false
-
-    override fun decodeFromByteArray(bytes: ByteArray?): String? {
-        readCalled = true
-        return if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            bytes.decodeToString()
-        }
+/**
+ * Implementation of [CacheSerializer] for [Moshi](https://github.com/square/moshi)
+ *
+ * @property adapter a moshi [JsonAdapter] for the desired type
+ */
+public class MoshiCacheSerializer<T> @Inject constructor(private val adapter: JsonAdapter<T>) : CacheSerializer<T> {
+    override fun decodeFromByteArray(bytes: ByteArray?): T? = if (bytes == null || bytes.isEmpty()) {
+        null
+    } else {
+        adapter.fromJson(bytes.decodeToString())
     }
 
-    override fun toByteArray(data: String?): ByteArray {
-        writeCalled = true
-        return data.orEmpty().encodeToByteArray()
+    override fun toByteArray(data: T?): ByteArray = if (data == null) {
+        ByteArray(0)
+    } else {
+        adapter.toJson(data).encodeToByteArray()
     }
 }

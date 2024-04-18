@@ -25,6 +25,7 @@ rootProject.name = "cache"
 include(":cache")
 include(":android")
 include(":kotlinx")
+include(":moshi")
 include(":sampleapp")
 
 pluginManagement {
