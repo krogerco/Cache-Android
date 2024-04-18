@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.inject)
 
     testImplementation(libs.jupiter.api)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.truth)
     testRuntimeOnly(libs.jupiter.engine)
 }

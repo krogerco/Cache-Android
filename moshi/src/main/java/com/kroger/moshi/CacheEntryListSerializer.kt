@@ -48,12 +48,12 @@ public class CacheEntryListSerializer<K, V> @Inject constructor(private val cach
     }
 
     override fun toJson(writer: JsonWriter, cacheEntries: List<CacheEntry<K, V>>?) {
-        require(!cacheEntries.isNullOrEmpty())
-
-        writer.beginArray()
-        cacheEntries.forEach { entry ->
-            cacheEntrySerializer.toJson(writer, entry)
-        }
-        writer.endArray()
+        cacheEntries?.let {
+            writer.beginArray()
+            cacheEntries.forEach { entry ->
+                cacheEntrySerializer.toJson(writer, entry)
+            }
+            writer.endArray()
+        } ?: writer.nullValue()
     }
 }
