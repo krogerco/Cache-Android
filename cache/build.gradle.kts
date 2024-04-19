@@ -1,3 +1,5 @@
+import com.kroger.gradle.config.junit5
+
 /**
  * MIT License
  *
@@ -22,16 +24,14 @@
  * SOFTWARE.
  */
 plugins {
-    `java-library-module`
-    `release-module`
+    alias(libs.plugins.conventions.publishedKotlinLibrary)
 }
 
 dependencies {
     implementation(libs.kotlinx.coroutines)
     api(libs.telemetry)
 
-    testImplementation(libs.jupiter.api)
+    junit5()
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.truth)
-    testRuntimeOnly(libs.jupiter.engine)
 }

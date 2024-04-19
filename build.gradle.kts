@@ -22,12 +22,19 @@
  * SOFTWARE.
  */
 plugins {
-    id("org.jetbrains.dokka")
-    id("com.google.devtools.ksp") version "1.7.20-1.0.8" apply false
-}
-
-tasks {
-    register("clean", Delete::class) {
-        delete(rootProject.buildDir)
-    }
+    alias(libs.plugins.conventions.androidApplication) apply false
+    alias(libs.plugins.conventions.publishedAndroidLibrary) apply false
+    alias(libs.plugins.conventions.publishedKotlinLibrary) apply false
+    alias(libs.plugins.conventions.root)
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.junit5) apply false
+    alias(libs.plugins.dependencyAnalysis) apply false
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.gradleVersions) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.kapt) apply false
+    alias(libs.plugins.kotlinter) apply false
+    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.mavenPublish) apply false
 }

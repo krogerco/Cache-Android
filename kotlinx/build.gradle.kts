@@ -1,3 +1,5 @@
+import com.kroger.gradle.config.junit5
+
 /**
  * MIT License
  *
@@ -22,9 +24,8 @@
  * SOFTWARE.
  */
 plugins {
-    `java-library-module`
-    `release-module`
-    kotlin("plugin.serialization")
+    alias(libs.plugins.conventions.publishedKotlinLibrary)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 dependencies {
@@ -33,8 +34,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.inject)
 
-    testImplementation(libs.jupiter.api)
+    junit5()
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.truth)
-    testRuntimeOnly(libs.jupiter.engine)
 }
