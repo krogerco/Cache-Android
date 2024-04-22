@@ -33,8 +33,6 @@ android {
 
 dependencies {
     api(project(":cache"))
-    api(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines)
 
     junitVintage()
