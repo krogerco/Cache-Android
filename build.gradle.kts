@@ -1,3 +1,5 @@
+import com.kroger.gradle.config.koverAllProjects
+
 /**
  * MIT License
  *
@@ -34,7 +36,19 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kapt) apply false
     alias(libs.plugins.kotlinter) apply false
-    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.kover) apply true
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.mavenPublish) apply false
+}
+
+koverReport {
+    filters {
+        excludes {
+            packages("com.kroger.cache.sampleapp")
+        }
+    }
+}
+
+dependencies {
+    koverAllProjects(rootProject)
 }

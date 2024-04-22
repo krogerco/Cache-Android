@@ -31,6 +31,12 @@ android {
     namespace = "com.kroger.cache.android"
 }
 
+koverReport {
+    defaults {
+        mergeWith("debug")
+    }
+}
+
 dependencies {
     api(project(":cache"))
     implementation(libs.kotlinx.coroutines)
