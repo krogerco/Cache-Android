@@ -24,12 +24,12 @@ import com.kroger.gradle.config.koverAllProjects
  * SOFTWARE.
  */
 plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.junit5) apply false
     alias(libs.plugins.conventions.androidApplication) apply false
     alias(libs.plugins.conventions.publishedAndroidLibrary) apply false
     alias(libs.plugins.conventions.publishedKotlinLibrary) apply false
     alias(libs.plugins.conventions.root)
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.android.junit5) apply false
     alias(libs.plugins.dependencyAnalysis) apply false
     alias(libs.plugins.dokka)
     alias(libs.plugins.gradleVersions) apply false
