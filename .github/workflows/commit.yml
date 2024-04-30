@@ -5,7 +5,7 @@ on: [ push, workflow_dispatch ]
 jobs:
   semantic_library_workflow:
     name: push
-    uses: krogerco/Shared-CI-Workflow-Android/.github/workflows/semantic_library_workflow.yml@v1.0.0
+    uses: krogerco/Shared-CI-Workflow-Android/.github/workflows/semantic_library_workflow.yml@v1.3.0
     with:
       java_version: '17'
       ktlint_version: '-1'
