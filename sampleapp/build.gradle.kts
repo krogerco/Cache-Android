@@ -46,7 +46,6 @@ dependencies {
     implementation(project(":android"))
     implementation(project(":kotlinx"))
     implementation(project(":moshi"))
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.iconsExtended)
