@@ -25,9 +25,9 @@ package com.kroger.cache.kotlinx
 
 import com.kroger.cache.internal.CacheEntry
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -41,8 +41,8 @@ public class CacheEntrySerializer<K, V>(private val keySerializer: KSerializer<K
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CacheEntry") {
         element("key", keySerializer.descriptor)
         element("value", valueSerializer.descriptor)
-        element<Long>("creationDate")
-        element<Long>("lastAccessDate")
+        element("creationDate", Long.serializer().descriptor)
+        element("lastAccessDate", Long.serializer().descriptor)
     }
 
     override fun serialize(encoder: Encoder, value: CacheEntry<K, V>) {
