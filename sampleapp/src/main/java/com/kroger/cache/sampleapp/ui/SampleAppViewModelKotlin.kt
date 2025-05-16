@@ -183,7 +183,6 @@ class SampleAppViewModelKotlin @Inject constructor(
         cacheCoroutineScope?.cancel()
         cacheCoroutineScope = CoroutineScope(EmptyCoroutineContext).also { scope ->
             cache = MemoryCacheManagerBuilder.from(
-                application,
                 flowPersistentCache,
             )
                 .coroutineScope(scope)

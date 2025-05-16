@@ -34,6 +34,10 @@ import com.kroger.cache.internal.CacheEntry
  * the cache when low memory events are received.
  * @see com.kroger.cache.MemoryCacheManagerBuilder.from
  */
+@Deprecated(
+    message = "This function is deprecated and will be removed in a future release. " +
+            "[AndroidMemoryLevelNotifier] is deprecated. Use [MemoryCacheManagerBuilder.from] without a context instead.",
+)
 public fun <K, V> MemoryCacheManagerBuilder.Companion.from(
     context: Context,
     snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null,

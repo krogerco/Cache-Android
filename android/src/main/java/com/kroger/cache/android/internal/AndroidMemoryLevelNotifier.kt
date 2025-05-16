@@ -40,6 +40,10 @@ import com.kroger.cache.MemoryLevelNotifier
  * @param context used to call [Context.getApplicationContext] and then [Context.registerComponentCallbacks]
  * to listen to trim memory events.
  */
+@Deprecated(
+    message = "This class is deprecated and will be removed in a future release. " +
+        "The related trim levels are now deprecated.",
+)
 public class AndroidMemoryLevelNotifier(
     context: Context,
 ) : MemoryLevelNotifier {
