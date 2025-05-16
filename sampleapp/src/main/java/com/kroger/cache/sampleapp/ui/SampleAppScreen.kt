@@ -321,7 +321,7 @@ private fun LazyItemScope.CacheEntry(
                 shape = RoundedCornerShape(CacheTheme.dimensions.padding),
             )
             .padding(start = CacheTheme.dimensions.gutter)
-            .animateItemPlacement(),
+            .animateItem(),
     ) {
         Row(
             Modifier.fillMaxWidth(),

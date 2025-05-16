@@ -20,4 +20,4 @@ jobs:
     name: Publish Documentation
     uses: krogerco/Shared-CI-Workflow-Android/.github/workflows/pages.yml@v1.3.0
     with:
-      java_version: '17'
+      java_version: '24'

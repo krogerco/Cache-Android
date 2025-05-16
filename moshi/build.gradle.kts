@@ -27,13 +27,21 @@ plugins {
     alias(libs.plugins.conventions.publishedKotlinLibrary)
 }
 
+kover {
+    currentProject {
+        createVariant("default") {
+            add("jvm")
+        }
+    }
+}
+
 dependencies {
     api(project(":cache"))
     api(libs.moshi.kotlin)
 
-    implementation(libs.inject)
+    implementation(libs.javax.inject)
 
     junit5()
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutinesTest)
+    testImplementation(libs.google.truth)
 }

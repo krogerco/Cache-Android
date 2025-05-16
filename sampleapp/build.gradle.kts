@@ -1,3 +1,6 @@
+import com.kroger.gradle.config.hiltKsp
+import com.kroger.gradle.config.moshi
+
 /**
  * MIT License
  *
@@ -23,8 +26,8 @@
  */
 plugins {
     alias(libs.plugins.conventions.androidApplication)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.ksp)
 }
 
@@ -49,14 +52,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.iconsExtended)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.googleMaterial)
+    implementation(libs.androidx.coreKtx)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.android.material)
 
     // Dagger Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-
-    ksp(libs.moshi.ksp)
+    hiltKsp()
+    moshi(codegen = true)
 }

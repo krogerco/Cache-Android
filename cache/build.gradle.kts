@@ -27,11 +27,19 @@ plugins {
     alias(libs.plugins.conventions.publishedKotlinLibrary)
 }
 
+kover {
+    currentProject {
+        createVariant("default") {
+            add("jvm")
+        }
+    }
+}
+
 dependencies {
-    implementation(libs.kotlinx.coroutines)
-    api(libs.telemetry)
+    implementation(libs.kotlinx.coroutinesCore)
+    api(libs.kroger.telemetry)
 
     junit5()
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutinesTest)
+    testImplementation(libs.google.truth)
 }

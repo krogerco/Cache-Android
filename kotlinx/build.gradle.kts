@@ -28,13 +28,21 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+kover {
+    currentProject {
+        createVariant("default") {
+            add("jvm")
+        }
+    }
+}
+
 dependencies {
     api(project(":cache"))
-    api(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.inject)
+    api(libs.kotlinx.serializationCore)
+    implementation(libs.kotlinx.serializationJson)
+    implementation(libs.javax.inject)
 
     junit5()
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutinesTest)
+    testImplementation(libs.google.truth)
 }

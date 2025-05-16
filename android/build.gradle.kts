@@ -31,24 +31,26 @@ android {
     namespace = "com.kroger.cache.android"
 }
 
-koverReport {
-    defaults {
-        mergeWith("debug")
+kover {
+    currentProject {
+        createVariant("default") {
+            add("debug")
+        }
     }
 }
 
 dependencies {
     api(project(":cache"))
-    implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.coroutinesCore)
 
     junitVintage()
     testImplementation(project(":kotlinx"))
     testImplementation(libs.mockk)
-    testImplementation(libs.truth)
+    testImplementation(libs.google.truth)
 
-    androidTestImplementation(libs.androidx.test.ext)
+    androidTestImplementation(libs.androidx.test.ext.junitKtx)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.uiAutomator)
-    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.google.truth)
 }
