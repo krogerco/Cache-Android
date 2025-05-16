@@ -430,17 +430,15 @@ internal class MemoryCacheManagerTest {
         cachePolicy: CachePolicy = CachePolicy(),
         saveFrequency: Duration = defaultSaveFrequency,
         memoryLevelNotifier: MemoryLevelNotifier? = null,
-    ): Cache<K, V> {
-        return RealMemoryCacheManagerBuilder(
-            snapshotPersistentCache,
-            fakeTimeProvider,
-        ).dispatcher(dispatcher)
-            .coroutineScope(scope)
-            .cachePolicy(cachePolicy)
-            .saveFrequency(saveFrequency)
-            .memoryLevelNotifier(memoryLevelNotifier)
-            .build()
-    }
+    ): Cache<K, V> = RealMemoryCacheManagerBuilder(
+        snapshotPersistentCache,
+        fakeTimeProvider,
+    ).dispatcher(dispatcher)
+        .coroutineScope(scope)
+        .cachePolicy(cachePolicy)
+        .saveFrequency(saveFrequency)
+        .memoryLevelNotifier(memoryLevelNotifier)
+        .build()
 
     companion object {
         val cacheEntry1 = CacheEntry("key1", "value1", 1000, 1000)

@@ -49,30 +49,27 @@ class CacheModule {
     @KotlinxCache
     fun provideKotlinCacheConfigFileCache(
         @ApplicationContext context: Context,
-    ): SnapshotPersistentCache<CacheConfig> =
-        SnapshotFileCacheBuilder.from(
-            context = context,
-            filename = "cacheConfigKotlinx.json",
-            cacheSerializer = KotlinCacheSerializer(serializer = CacheConfig.serializer()),
-        ).build()
+    ): SnapshotPersistentCache<CacheConfig> = SnapshotFileCacheBuilder.from(
+        context = context,
+        filename = "cacheConfigKotlinx.json",
+        cacheSerializer = KotlinCacheSerializer(serializer = CacheConfig.serializer()),
+    ).build()
 
     @Provides
     @KotlinxCache
     fun provideKotlinFileCache(
         @ApplicationContext context: Context,
-    ): SnapshotPersistentCache<List<CacheEntry<String, String>>> =
-        SnapshotFileCacheBuilder.from(
-            context,
-            filename = "cacheFileKotlinx.json",
-            cacheSerializer = CacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = String.serializer()),
-        ).build()
+    ): SnapshotPersistentCache<List<CacheEntry<String, String>>> = SnapshotFileCacheBuilder.from(
+        context,
+        filename = "cacheFileKotlinx.json",
+        cacheSerializer = CacheEntryListSerializer(keySerializer = String.serializer(), valueSerializer = String.serializer()),
+    ).build()
 
     @Provides
     @KotlinxCache
     fun provideKotlinSnapshotCacheFlowWrapper(
         @KotlinxCache snapshotCache: SnapshotPersistentCache<List<CacheEntry<String, String>>>,
-    ): FlowPersistentCache<List<CacheEntry<String, String>>> =
-        FlowPersistentCache(snapshotCache)
+    ): FlowPersistentCache<List<CacheEntry<String, String>>> = FlowPersistentCache(snapshotCache)
 
     @Provides
     fun provideMoshi(): Moshi = Moshi.Builder().build()
@@ -82,39 +79,36 @@ class CacheModule {
     fun provideMoshiCacheConfigFileCache(
         @ApplicationContext context: Context,
         moshi: Moshi,
-    ): SnapshotPersistentCache<CacheConfig> =
-        SnapshotFileCacheBuilder.from(
-            context = context,
-            filename = "cacheConfigMoshi.json",
-            cacheSerializer = MoshiCacheSerializer<CacheConfig>(moshi.adapter(CacheConfig::class.java)),
-        ).build()
+    ): SnapshotPersistentCache<CacheConfig> = SnapshotFileCacheBuilder.from(
+        context = context,
+        filename = "cacheConfigMoshi.json",
+        cacheSerializer = MoshiCacheSerializer<CacheConfig>(moshi.adapter(CacheConfig::class.java)),
+    ).build()
 
     @Provides
     @MoshiCache
     fun provideMoshiFileCache(
         @ApplicationContext context: Context,
         moshi: Moshi,
-    ): SnapshotPersistentCache<List<CacheEntry<String, String>>> =
-        SnapshotFileCacheBuilder.from(
-            context,
-            filename = "cacheFileMoshi.json",
-            cacheSerializer = MoshiCacheSerializer(
-                com.kroger.moshi.CacheEntryListSerializer(
-                    com.kroger.moshi.CacheEntrySerializer<String, String>(
-                        moshi,
-                        keyAdapter = moshi.adapter(String::class.java),
-                        valueAdapter = moshi.adapter(String::class.java),
-                    ),
+    ): SnapshotPersistentCache<List<CacheEntry<String, String>>> = SnapshotFileCacheBuilder.from(
+        context,
+        filename = "cacheFileMoshi.json",
+        cacheSerializer = MoshiCacheSerializer(
+            com.kroger.moshi.CacheEntryListSerializer(
+                com.kroger.moshi.CacheEntrySerializer<String, String>(
+                    moshi,
+                    keyAdapter = moshi.adapter(String::class.java),
+                    valueAdapter = moshi.adapter(String::class.java),
                 ),
             ),
-        ).build()
+        ),
+    ).build()
 
     @Provides
     @MoshiCache
     fun provideMoshiSnapshotCacheFlowWrapper(
         @MoshiCache snapshotCache: SnapshotPersistentCache<List<CacheEntry<String, String>>>,
-    ): FlowPersistentCache<List<CacheEntry<String, String>>> =
-        FlowPersistentCache(snapshotCache)
+    ): FlowPersistentCache<List<CacheEntry<String, String>>> = FlowPersistentCache(snapshotCache)
 }
 
 @Qualifier

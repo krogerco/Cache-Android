@@ -65,7 +65,8 @@ class SampleAppViewModelKotlin @Inject constructor(
     @KotlinxCache private val configFileCache: SnapshotPersistentCache<CacheConfig>,
     @KotlinxCache private val flowPersistentCache: FlowPersistentCache<List<CacheEntry<String, String>>>,
     private val application: Application,
-) : ViewModel(), ViewModelContract {
+) : ViewModel(),
+    ViewModelContract {
     private lateinit var cache: Cache<String, String>
     private var cacheCoroutineScope: CoroutineScope? = null
     private val cacheConfigFlow: MutableStateFlow<CacheConfig?> = MutableStateFlow(null)

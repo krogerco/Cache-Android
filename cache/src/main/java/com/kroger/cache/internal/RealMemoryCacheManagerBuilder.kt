@@ -48,38 +48,32 @@ internal class RealMemoryCacheManagerBuilder<K, V>(
     private var memoryLevelNotifier: MemoryLevelNotifier? = null
     private var telemeter: Telemeter? = null
 
-    override fun cachePolicy(cachePolicy: CachePolicy): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            this.cachePolicy = cachePolicy
-        }
+    override fun cachePolicy(cachePolicy: CachePolicy): MemoryCacheManagerBuilder<K, V> = apply {
+        this.cachePolicy = cachePolicy
+    }
 
-    override fun saveFrequency(saveFrequency: Duration): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            require(saveFrequency.inWholeMilliseconds >= 0) {
-                "saveFrequency must be >= 0: saveFrequency=${saveFrequency.inWholeMilliseconds} milliseconds"
-            }
-            this.saveFrequency = saveFrequency
+    override fun saveFrequency(saveFrequency: Duration): MemoryCacheManagerBuilder<K, V> = apply {
+        require(saveFrequency.inWholeMilliseconds >= 0) {
+            "saveFrequency must be >= 0: saveFrequency=${saveFrequency.inWholeMilliseconds} milliseconds"
         }
+        this.saveFrequency = saveFrequency
+    }
 
-    override fun memoryLevelNotifier(memoryLevelNotifier: MemoryLevelNotifier?): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            this.memoryLevelNotifier = memoryLevelNotifier
-        }
+    override fun memoryLevelNotifier(memoryLevelNotifier: MemoryLevelNotifier?): MemoryCacheManagerBuilder<K, V> = apply {
+        this.memoryLevelNotifier = memoryLevelNotifier
+    }
 
-    override fun telemeter(telemeter: Telemeter): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            this.telemeter = telemeter
-        }
+    override fun telemeter(telemeter: Telemeter): MemoryCacheManagerBuilder<K, V> = apply {
+        this.telemeter = telemeter
+    }
 
-    override fun dispatcher(dispatcher: CoroutineDispatcher): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            this.dispatcher = dispatcher
-        }
+    override fun dispatcher(dispatcher: CoroutineDispatcher): MemoryCacheManagerBuilder<K, V> = apply {
+        this.dispatcher = dispatcher
+    }
 
-    override fun coroutineScope(coroutineScope: CoroutineScope): MemoryCacheManagerBuilder<K, V> =
-        apply {
-            this.coroutineScope = coroutineScope
-        }
+    override fun coroutineScope(coroutineScope: CoroutineScope): MemoryCacheManagerBuilder<K, V> = apply {
+        this.coroutineScope = coroutineScope
+    }
 
     override fun build(): Cache<K, V> {
         val memoryCacheManager = MemoryCacheManager(

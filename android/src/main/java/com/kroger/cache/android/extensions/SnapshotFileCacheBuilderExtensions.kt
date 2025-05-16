@@ -39,9 +39,8 @@ public fun <T> SnapshotFileCacheBuilder.Companion.from(
     context: Context,
     filename: String,
     cacheSerializer: CacheSerializer<T>,
-): SnapshotFileCacheBuilder<T> =
-    from(
-        context.cacheDir.resolve(defaultCacheDir),
-        filename,
-        cacheSerializer,
-    )
+): SnapshotFileCacheBuilder<T> = from(
+    context.cacheDir.resolve(defaultCacheDir),
+    filename,
+    cacheSerializer,
+)

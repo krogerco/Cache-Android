@@ -36,8 +36,7 @@ internal class FakeTimeProvider(
     val timeSource = TestTimeSource()
     private val seedTime = timeSource.markNow()
 
-    override fun invoke(): Long =
-        seedTime.elapsedNow().inWholeMilliseconds.also {
-            timeSource += autoAdvanceIncrement
-        }
+    override fun invoke(): Long = seedTime.elapsedNow().inWholeMilliseconds.also {
+        timeSource += autoAdvanceIncrement
+    }
 }

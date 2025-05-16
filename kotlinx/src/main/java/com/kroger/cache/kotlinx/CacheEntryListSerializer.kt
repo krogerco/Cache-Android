@@ -41,12 +41,11 @@ public class CacheEntryListSerializer<K, V> @Inject constructor(
 ) : CacheSerializer<List<CacheEntry<K, V>>> {
     private val listSerializer = ListSerializer(CacheEntrySerializer(keySerializer, valueSerializer))
 
-    override fun decodeFromByteArray(bytes: ByteArray?): List<CacheEntry<K, V>>? =
-        if (bytes == null || bytes.isEmpty()) {
-            null
-        } else {
-            formatter.decodeFromString(listSerializer, bytes.decodeToString())
-        }
+    override fun decodeFromByteArray(bytes: ByteArray?): List<CacheEntry<K, V>>? = if (bytes == null || bytes.isEmpty()) {
+        null
+    } else {
+        formatter.decodeFromString(listSerializer, bytes.decodeToString())
+    }
 
     override fun toByteArray(data: List<CacheEntry<K, V>>?): ByteArray = if (data == null) {
         ByteArray(0)

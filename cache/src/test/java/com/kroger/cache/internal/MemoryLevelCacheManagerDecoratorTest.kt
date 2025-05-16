@@ -113,15 +113,13 @@ internal class MemoryLevelCacheManagerDecoratorTest {
         scope: CoroutineScope,
         dispatcher: CoroutineDispatcher,
         cachePolicy: CachePolicy = CachePolicy(),
-    ): Cache<K, V> {
-        return RealMemoryCacheManagerBuilder<K, V>(
-            snapshotPersistentCache,
-            fakeTimeProvider,
-        ).dispatcher(dispatcher)
-            .coroutineScope(scope)
-            .telemeter(fakeTelemeter)
-            .memoryLevelNotifier(fakeMemoryLevelNotifier)
-            .cachePolicy(cachePolicy)
-            .build()
-    }
+    ): Cache<K, V> = RealMemoryCacheManagerBuilder<K, V>(
+        snapshotPersistentCache,
+        fakeTimeProvider,
+    ).dispatcher(dispatcher)
+        .coroutineScope(scope)
+        .telemeter(fakeTelemeter)
+        .memoryLevelNotifier(fakeMemoryLevelNotifier)
+        .cachePolicy(cachePolicy)
+        .build()
 }

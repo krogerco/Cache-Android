@@ -36,7 +36,7 @@ import com.kroger.cache.internal.CacheEntry
  */
 @Deprecated(
     message = "This function is deprecated and will be removed in a future release. " +
-            "[AndroidMemoryLevelNotifier] is deprecated. Use [MemoryCacheManagerBuilder.from] without a context instead.",
+        "[AndroidMemoryLevelNotifier] is deprecated. Use [MemoryCacheManagerBuilder.from] without a context instead.",
 )
 public fun <K, V> MemoryCacheManagerBuilder.Companion.from(
     context: Context,

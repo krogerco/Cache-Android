@@ -31,8 +31,7 @@ internal class InMemorySnapshotPersistentCache<T>(
     var saveCallCount = 0
         private set
 
-    override suspend fun read(): T? =
-        entries
+    override suspend fun read(): T? = entries
 
     override suspend fun save(cachedData: T?) {
         entries = cachedData

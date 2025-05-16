@@ -232,9 +232,8 @@ private fun <T> MutableIterator<T>.drop(n: Int) {
     }
 }
 
-private fun <K, V> CachePolicy.sortByProperty(): (CacheEntry<K, V>) -> Long =
-    if (hasTtiPolicy) {
-        CacheEntry<K, V>::lastAccessDate::get
-    } else {
-        CacheEntry<K, V>::creationDate::get
-    }
+private fun <K, V> CachePolicy.sortByProperty(): (CacheEntry<K, V>) -> Long = if (hasTtiPolicy) {
+    CacheEntry<K, V>::lastAccessDate::get
+} else {
+    CacheEntry<K, V>::creationDate::get
+}

@@ -39,21 +39,18 @@ internal class RealSnapshotFileCacheBuilder<T>(
     private var dispatcher: CoroutineDispatcher = Dispatchers.IO
     private var telemeter: Telemeter? = null
 
-    override fun dispatcher(dispatcher: CoroutineDispatcher): RealSnapshotFileCacheBuilder<T> =
-        apply {
-            this.dispatcher = dispatcher
-        }
+    override fun dispatcher(dispatcher: CoroutineDispatcher): RealSnapshotFileCacheBuilder<T> = apply {
+        this.dispatcher = dispatcher
+    }
 
-    override fun telemeter(telemeter: Telemeter): RealSnapshotFileCacheBuilder<T> =
-        apply {
-            this.telemeter = telemeter
-        }
+    override fun telemeter(telemeter: Telemeter): RealSnapshotFileCacheBuilder<T> = apply {
+        this.telemeter = telemeter
+    }
 
-    override fun build(): SnapshotPersistentCache<T> =
-        SnapshotFileCache(
-            parentDirectory.resolve(filename),
-            cacheSerializer,
-            telemeter,
-            dispatcher,
-        )
+    override fun build(): SnapshotPersistentCache<T> = SnapshotFileCache(
+        parentDirectory.resolve(filename),
+        cacheSerializer,
+        telemeter,
+        dispatcher,
+    )
 }

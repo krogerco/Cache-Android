@@ -44,9 +44,7 @@ internal class MemoryCache<K, V>(
     constructor(initialCapacity: Int = DEFAULT_INITIAL_CAPACITY) :
         this(initialCapacity, false)
 
-    override suspend fun get(key: K): V? {
-        return cacheMap[key]
-    }
+    override suspend fun get(key: K): V? = cacheMap[key]
 
     override suspend fun put(key: K, value: V) {
         cacheMap[key] = value
@@ -67,8 +65,7 @@ internal class MemoryCache<K, V>(
     /**
      * @return all entries in the [MemoryCache]
      */
-    internal fun getAll(): MutableCollection<MutableMap.MutableEntry<K, V>> =
-        cacheMap.entries
+    internal fun getAll(): MutableCollection<MutableMap.MutableEntry<K, V>> = cacheMap.entries
 
     /**
      * @return the current number of entries in [cacheMap]

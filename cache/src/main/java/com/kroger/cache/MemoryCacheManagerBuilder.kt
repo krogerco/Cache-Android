@@ -87,9 +87,8 @@ public interface MemoryCacheManagerBuilder<K, V> {
          */
         public fun <K, V> from(
             snapshotPersistentCache: SnapshotPersistentCache<List<CacheEntry<K, V>>>? = null,
-        ): MemoryCacheManagerBuilder<K, V> =
-            RealMemoryCacheManagerBuilder(snapshotPersistentCache) {
-                System.currentTimeMillis()
-            }
+        ): MemoryCacheManagerBuilder<K, V> = RealMemoryCacheManagerBuilder(snapshotPersistentCache) {
+            System.currentTimeMillis()
+        }
     }
 }

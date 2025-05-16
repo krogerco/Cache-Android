@@ -33,32 +33,29 @@ import kotlin.time.toDuration
  * @param cachePolicy [CachePolicy] to use to calculate the temporal age of the [CacheEntry]
  * @return the age of the [CacheEntry] as a [Duration]
  */
-fun <K, V> CacheEntry<K, V>.temporalAge(cachePolicy: CachePolicy): Duration =
-    when {
-        cachePolicy.hasTtiPolicy -> (System.currentTimeMillis() - lastAccessDate).toDuration(DurationUnit.MILLISECONDS)
-        cachePolicy.hasTtlPolicy -> (System.currentTimeMillis() - creationDate).toDuration(DurationUnit.MILLISECONDS)
-        else -> Duration.INFINITE
-    }
+fun <K, V> CacheEntry<K, V>.temporalAge(cachePolicy: CachePolicy): Duration = when {
+    cachePolicy.hasTtiPolicy -> (System.currentTimeMillis() - lastAccessDate).toDuration(DurationUnit.MILLISECONDS)
+    cachePolicy.hasTtlPolicy -> (System.currentTimeMillis() - creationDate).toDuration(DurationUnit.MILLISECONDS)
+    else -> Duration.INFINITE
+}
 
 /**
  * @param cachePolicy [CachePolicy] to use when checking if the [CacheEntry] is expired
  * @return true if the [CacheEntry] is expired, false otherwise
  */
-fun <K, V> CacheEntry<K, V>.isExpired(cachePolicy: CachePolicy): Boolean =
-    when {
-        cachePolicy.hasTtiPolicy -> temporalAge(cachePolicy) > cachePolicy.entryTti
-        cachePolicy.hasTtlPolicy -> temporalAge(cachePolicy) > cachePolicy.entryTtl
-        else -> false
-    }
+fun <K, V> CacheEntry<K, V>.isExpired(cachePolicy: CachePolicy): Boolean = when {
+    cachePolicy.hasTtiPolicy -> temporalAge(cachePolicy) > cachePolicy.entryTti
+    cachePolicy.hasTtlPolicy -> temporalAge(cachePolicy) > cachePolicy.entryTtl
+    else -> false
+}
 
 /**
  * @param config [CacheConfig] to convert into a [CachePolicy]
  */
-fun CachePolicy.Companion.from(config: CacheConfig?): CachePolicy =
-    builder().apply {
-        if (config != null) {
-            config.tti?.let { entryTti(it.toDuration(DurationUnit.SECONDS)) }
-            config.ttl?.let { entryTtl(it.toDuration(DurationUnit.SECONDS)) }
-            maxSize(config.maxSize)
-        }
-    }.build()
+fun CachePolicy.Companion.from(config: CacheConfig?): CachePolicy = builder().apply {
+    if (config != null) {
+        config.tti?.let { entryTti(it.toDuration(DurationUnit.SECONDS)) }
+        config.ttl?.let { entryTtl(it.toDuration(DurationUnit.SECONDS)) }
+        maxSize(config.maxSize)
+    }
+}.build()

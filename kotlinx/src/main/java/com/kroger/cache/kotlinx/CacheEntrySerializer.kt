@@ -54,23 +54,22 @@ public class CacheEntrySerializer<K, V>(private val keySerializer: KSerializer<K
         }
     }
 
-    override fun deserialize(decoder: Decoder): CacheEntry<K, V> =
-        decoder.decodeStructure(descriptor) {
-            var key: K? = null
-            var value: V? = null
-            var creationDate = 0L
-            var lastAccessDate = 0L
-            while (true) {
-                when (val index = decodeElementIndex(descriptor)) {
-                    0 -> key = decodeSerializableElement(descriptor, 0, keySerializer)
-                    1 -> value = decodeSerializableElement(descriptor, 1, valueSerializer)
-                    2 -> creationDate = decodeLongElement(descriptor, 2)
-                    3 -> lastAccessDate = decodeLongElement(descriptor, 3)
-                    CompositeDecoder.DECODE_DONE -> break
-                    else -> error("Unexpected index: $index")
-                }
+    override fun deserialize(decoder: Decoder): CacheEntry<K, V> = decoder.decodeStructure(descriptor) {
+        var key: K? = null
+        var value: V? = null
+        var creationDate = 0L
+        var lastAccessDate = 0L
+        while (true) {
+            when (val index = decodeElementIndex(descriptor)) {
+                0 -> key = decodeSerializableElement(descriptor, 0, keySerializer)
+                1 -> value = decodeSerializableElement(descriptor, 1, valueSerializer)
+                2 -> creationDate = decodeLongElement(descriptor, 2)
+                3 -> lastAccessDate = decodeLongElement(descriptor, 3)
+                CompositeDecoder.DECODE_DONE -> break
+                else -> error("Unexpected index: $index")
             }
-            require(key != null && value != null && creationDate != 0L && lastAccessDate != 0L)
-            CacheEntry(key, value, creationDate, lastAccessDate)
         }
+        require(key != null && value != null && creationDate != 0L && lastAccessDate != 0L)
+        CacheEntry(key, value, creationDate, lastAccessDate)
+    }
 }

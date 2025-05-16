@@ -64,11 +64,10 @@ public interface SnapshotFileCacheBuilder<T> {
             parentDirectory: File,
             filename: String,
             valueSerializer: CacheSerializer<T>,
-        ): SnapshotFileCacheBuilder<T> =
-            RealSnapshotFileCacheBuilder(
-                parentDirectory,
-                filename,
-                valueSerializer,
-            )
+        ): SnapshotFileCacheBuilder<T> = RealSnapshotFileCacheBuilder(
+            parentDirectory,
+            filename,
+            valueSerializer,
+        )
     }
 }

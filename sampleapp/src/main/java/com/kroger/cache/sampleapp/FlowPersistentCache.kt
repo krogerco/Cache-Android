@@ -41,12 +41,11 @@ class FlowPersistentCache<T>(
 
     val data: SharedFlow<T?> = _data.asSharedFlow()
 
-    override suspend fun read(): T? =
-        if (data.replayCache.any()) {
-            data.replayCache.first()
-        } else {
-            snapshotPersistentCache.read().also { _data.tryEmit(it) }
-        }
+    override suspend fun read(): T? = if (data.replayCache.any()) {
+        data.replayCache.first()
+    } else {
+        snapshotPersistentCache.read().also { _data.tryEmit(it) }
+    }
 
     override suspend fun save(cachedData: T?) {
         snapshotPersistentCache.save(cachedData)
