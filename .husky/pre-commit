@@ -4,3 +4,10 @@ else
   echo "ERROR: Please install ktlint to contribute to this project: brew install ktlint"
   exit 1
 fi
+
+if which addlicense; then
+  addlicense -f LICENSE $(find . -path "*/src/*" \( -name "*.java" -o -name "*.kt" -o -name "*.kts" \) -type f)
+else
+  echo "ERROR: Please install addlicense to contribute to this project: brew install addlicense"
+  exit 1
+fi
