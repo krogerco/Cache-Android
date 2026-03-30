@@ -1,4 +1,6 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-ktlint "**/src/**/*.kt" "!**/generated/**" --android --reporter=plain?group_by_file
+if which ktlint; then
+  ktlint "**/src/**/*.kt" "!**/generated/**" --android --reporter=plain?group_by_file
+else
+  echo "ERROR: Please install ktlint to contribute to this project: brew install ktlint"
+  exit 1
+fi
