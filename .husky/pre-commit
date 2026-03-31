@@ -1,4 +1,13 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+if which ktlint; then
+  ktlint "**/src/**/*.kt" "!**/generated/**" --android --reporter=plain?group_by_file
+else
+  echo "ERROR: Please install ktlint to contribute to this project: brew install ktlint"
+  exit 1
+fi
 
-ktlint "**/src/**/*.kt" "!**/generated/**" --android --reporter=plain?group_by_file
+if which addlicense; then
+  addlicense -f LICENSE $(find . -path "*/src/*" \( -name "*.java" -o -name "*.kt" -o -name "*.kts" \) -type f)
+else
+  echo "ERROR: Please install addlicense to contribute to this project: brew install addlicense"
+  exit 1
+fi

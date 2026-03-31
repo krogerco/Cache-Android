@@ -5,6 +5,7 @@ on:
       - opened
       - reopened
       - edited
+
 jobs:
   check_pr_title:
     name: Check PR Title
