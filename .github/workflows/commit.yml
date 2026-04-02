@@ -7,6 +7,9 @@ jobs:
     name: push
     uses: krogerco/Shared-CI-Workflow-Android/.github/workflows/semantic_library_workflow.yml@v1.5.0
     with:
+      java_version: '17'
+      ktlint_version: '-1'
+      test_command: 'test'
       commitlint_version: "20"
     secrets:
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralUsername }}

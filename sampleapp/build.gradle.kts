@@ -22,79 +22,33 @@
  * SOFTWARE.
  */
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
-    kotlin("plugin.serialization")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
-}
-
-kapt {
-    correctErrorTypes = true
+    alias(libs.plugins.conventions.androidApplication)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.kroger.cache.sampleapp"
-    compileSdk = SdkVersions.compileSdkVersion
 
     defaultConfig {
         applicationId = "com.kroger.cache.sampleapp"
-        minSdk = SdkVersions.minSdkVersion
-        targetSdk = SdkVersions.targetSdkVersion
-    }
-
-    buildFeatures {
-        compose = true
     }
 
     buildTypes {
-        debug {
-            isDebuggable = true
-        }
         release {
             isMinifyEnabled = false
         }
     }
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
-    }
-
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
-    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
-    // Needed to work around issue https://stackoverflow.com/a/75298544/1435985
-    constraints {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-        }
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
-            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-        }
-    }
-
     implementation(project(":android"))
     implementation(project(":kotlinx"))
     implementation(project(":moshi"))
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.iconsExtended)
-    debugImplementation(libs.androidx.compose.ui.testManifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
