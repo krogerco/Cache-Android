@@ -1,0 +1,22 @@
+name: Pull Request License Check
+on:
+  pull_request:
+
+jobs:
+  check_licenses:
+    name: Check License Headers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Find Source Files
+        id: find-files
+        shell: bash
+        run: |
+          echo "SOURCE_FILES=$(find . -path "*/src/*" \( -name "*.java" -o -name "*.kt" -o -name "*.kts" \) -type f -exec printf "%s " {} \;)" >> "$GITHUB_OUTPUT"
+
+      - name: Run addlicense
+        uses: docker://ghcr.io/google/addlicense:v1.2.0
+        with:
+          args: -check -v -f LICENSE ${{ steps.find-files.outputs.SOURCE_FILES }}
