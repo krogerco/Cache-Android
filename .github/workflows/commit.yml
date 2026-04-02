@@ -10,6 +10,7 @@ jobs:
       java_version: '17'
       ktlint_version: '-1'
       test_command: 'test'
+      commitlint_version: "20"
     secrets:
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralUsername }}
       ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralPassword }}
