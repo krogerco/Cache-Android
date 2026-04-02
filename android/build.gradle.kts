@@ -1,3 +1,5 @@
+import com.kroger.gradle.config.junitVintage
+
 /**
  * MIT License
  *
@@ -22,25 +24,27 @@
  * SOFTWARE.
  */
 plugins {
-    `android-library-module`
-    `release-module`
+    alias(libs.plugins.conventions.publishedAndroidLibrary)
 }
 
 android {
     namespace = "com.kroger.cache.android"
 }
 
+koverReport {
+    defaults {
+        mergeWith("debug")
+    }
+}
+
 dependencies {
     api(project(":cache"))
-    api(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines)
 
+    junitVintage()
     testImplementation(project(":kotlinx"))
-    testImplementation(libs.jupiter.api)
     testImplementation(libs.mockk)
     testImplementation(libs.truth)
-    testRuntimeOnly(libs.jupiter.engine)
 
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.rules)
