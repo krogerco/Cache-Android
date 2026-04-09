@@ -1,16 +1,3 @@
-package com.kroger.cache.internal
-
-import com.kroger.cache.SnapshotPersistentCache
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-
 /**
  * MIT License
  *
@@ -34,12 +21,28 @@ import kotlinx.coroutines.launch
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.kroger.cache
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
 /**
- * A Wrapper class for a SnapshotPersistentCache that exposes changes to the cache via a flow.
+ * A Wrapper class for a SnapshotPersistentCache that persists changes made to the value of the state flow
  *
- * **Note this works best when used as a singleton
+ * Only emits values on the flow that are set via the same instance.
+ * If two flow wrappers exist for the same SnapshotPersistentCache, and one gets updated, the second will be out of sync.
  *
- * @param cache the [com.kroger.cache.SnapshotPersistentCache] holding the value(s) on disk
+ * @param cache the [SnapshotPersistentCache] holding the value(s) on disk
  * @param scope the [kotlinx.coroutines.CoroutineScope] to run the flow on
  *
  */
