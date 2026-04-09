@@ -24,10 +24,7 @@
 package com.kroger.cache
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,29 +48,29 @@ public class CacheFlowWrapper<T>(
     private val scope: CoroutineScope,
 ) {
     /**
-     * A reference to the coroutine job used for reading the first value from the [cache] and emitting it on [_cacheValueState]
+     * A reference to the coroutine job used for reading the first value from the [cache] and emitting it on [_cacheValueFlow]
      */
     private val initializerJob: Job
 
     /**
      * The private mutable state flow for the current value
      */
-    private val _cacheValueState = MutableStateFlow<T?>(null)
+    private val _cacheValueFlow = MutableStateFlow<T?>(null)
 
     /**
      * publicly exposed read-only flow on which to read and observe changes to the current value
      */
-    public val cacheValueFlow: StateFlow<T?> = _cacheValueState.asStateFlow()
+    public val cacheValueFlow: StateFlow<T?> = _cacheValueFlow.asStateFlow()
 
     /**
-     * Initialization block reads the value the [cache] and emits it on [_cacheValueState]
+     * Initialization block reads the value the [cache] and emits it on [_cacheValueFlow]
      *
      * This job also updates the value in [cache] for each new value emitted on the flow
      * except for the first, which is read from [cache]
      */
     init {
         initializerJob = scope.launch {
-            _cacheValueState.value = cache.read()
+            _cacheValueFlow.value = cache.read()
 
             cacheValueFlow
                 .drop(1)
@@ -95,6 +92,6 @@ public class CacheFlowWrapper<T>(
         if (initializerJob.isActive) {
             initializerJob.join()
         }
-        _cacheValueState.emit(newValue)
+        _cacheValueFlow.emit(newValue)
     }
 }
