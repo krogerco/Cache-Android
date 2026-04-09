@@ -29,7 +29,7 @@ import com.kroger.cache.Cache
  * A wrapper around a [Map] to work as an in-memory cache.
  * This class is not thread-safe and callers must ensure access is synchronized.
  *
- * @param initialCapacity the initial capacity to use when creatig the [Map].
+ * @param initialCapacity the initial capacity to use when creating the [Map].
  */
 internal class MemoryCache<K, V>(
     initialCapacity: Int,
